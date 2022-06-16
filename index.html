@@ -8,9 +8,8 @@
   <script src="./node_modules/blockly/blocks_compressed.js"></script>
   <script src="./node_modules/blockly/python_compressed.js"></script>
   <script src="./node_modules/blockly/msg/en.js"></script>
-  <script src="./node_modules/blockly/generators/python/variables.js"></script>
-  <script src="./node_modules/blockly/blocks/variables.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./node_modules/blockly/generators/python/robotarium.js"></script>
+  <script src="./node_modules/blockly/blocks/robotarium.js"></script>
 
   <style>
     body {
@@ -22,27 +21,12 @@
       font-weight: normal;
       font-size: 140%;
     }
+
+    textarea {
+      width: 50%;
+    }
   </style>
 </head>
-<header class="text-gray-600 body-font">
-  <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-    <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-      <span class="ml-3 text-xl">Robotarium Blockly Project</span>
-    </a>
-    <nav
-      class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400	flex flex-wrap items-center text-base justify-center">
-      <a class="mr-5 hover:text-gray-900"></a>
-    </nav>
-    <button onclick="location.href='https://www.robotarium.gatech.edu/'" type="button"
-      class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">Robotarium
-      Website
-      <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        class="w-4 h-4 ml-1" viewBox="0 0 24 24">
-        <path d="M5 12h14M12 5l7 7-7 7"></path>
-      </svg>
-    </button>
-  </div>
-</header>
 
 <body>
   <p>This is a simple demo of generating code from blocks and running
@@ -57,6 +41,7 @@
   <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
   <div id="outputDiv">
   </div>
+  <a id="download" href="" download="output.py">Download</a>
 
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="Logic" colour="%{BKY_LOGIC_HUE}">
@@ -83,10 +68,9 @@
       <block type="math_arithmetic"></block>
       <block type="math_single"></block>
     </category>
+
     <category name="Variables" colour="%{BKY_TEXTS_HUE}">
-      <block type="initialize"></block>
-      <block type="new_robot"></block>
-      <block type="end_initialize"></block>
+
     </category>
 
     <category name="Text" colour="%{BKY_TEXTS_HUE}">
@@ -94,10 +78,16 @@
       <block type="text_length"></block>
       <block type="text_print"></block>
     </category>
+
+    <category name="Robotarium" colur="%{BKY_LOGIC_HUE}">
+      <block type="initialize"></block>
+      <block type="new_robot"></block>
+      <block type="end_initialize"></block>
+    </category>
   </xml>
 
   <xml xmlns="https://developers.google.com/blockly/xml" id="startBlocks" style="display: none">
-    <block type="controls_if" inline="false" x="20" y="20">
+    <!-- <block type="controls_if" inline="false" x="20" y="20">
       <mutation else="1"></mutation>
       <value name="IF0">
         <block type="logic_compare" inline="true">
@@ -142,7 +132,7 @@
           </value>
         </block>
       </statement>
-    </block>
+    </block> -->
   </xml>
 
   <script>
@@ -167,6 +157,7 @@
       }
       else {
         para = document.getElementById("output");
+        para.innerHTML = "";
         createdAlready = true;
       }
 
@@ -175,6 +166,8 @@
 
       para.style.height = "auto";
       para.style.height = (this.scrollHeight) + "px";
+
+
 
       para.id = "output"
 
@@ -187,6 +180,18 @@
       for (let i = 0; i < tx.length; i++) {
         tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
       }
+
+      var pythonFile = null;
+      console.log(code);
+      var data = new Blob([code], { type: 'text/x-python' });
+
+      if (pythonFile !== null) {
+        window.URL.revokeObjectURL(pythonFile);
+      }
+
+      pythonFile = window.URL.createObjectURL(data);
+
+      document.getElementById("download").href = pythonFile;
     }
 
     function runCode() {
