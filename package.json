@@ -1,7 +1,7 @@
 {
   "name": "blockly-generator-demo",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "blocklyDemoConfig": {
     "title": "Generate JavaScript",
     "description": "Turn blocks into code and execute it.",
