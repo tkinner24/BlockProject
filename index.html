@@ -91,6 +91,29 @@
   </xml>
 
   <xml xmlns="https://developers.google.com/blockly/xml" id="startBlocks" style="display: none">
+    <block type="initialize" x="20" y="20">
+      <next>
+        <block type="new_robot">
+          <field name="name">Bob</field>
+          <next>
+            <block type="end_initialize">
+              <next>
+                <block type="display_image">
+                  <next>
+                    <block type="run_to_point">
+                      <next>
+                        <block type="end"></block>
+                      </next>
+                    </block>
+                  </next>
+                </block>
+              </next>
+            </block>
+          </next>
+        </block>
+      </next>
+    </block>
+    
     <!-- <block type="controls_if" inline="false" x="20" y="20">
       <mutation else="1"></mutation>
       <value name="IF0">
