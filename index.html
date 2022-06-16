@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Blockly Demo: Generating JavaScript</title>
@@ -9,30 +10,53 @@
   <script src="./node_modules/blockly/msg/en.js"></script>
   <script src="./node_modules/blockly/generators/python/variables.js"></script>
   <script src="./node_modules/blockly/blocks/variables.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body {
       background-color: #fff;
       font-family: sans-serif;
     }
+
     h1 {
       font-weight: normal;
       font-size: 140%;
     }
   </style>
 </head>
+<header class="text-gray-600 body-font">
+  <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+    <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
+      <span class="ml-3 text-xl">Robotarium Blockly Project</span>
+    </a>
+    <nav
+      class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400	flex flex-wrap items-center text-base justify-center">
+      <a class="mr-5 hover:text-gray-900"></a>
+    </nav>
+    <button onclick="location.href='https://www.robotarium.gatech.edu/'" type="button"
+      class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">Robotarium
+      Website
+      <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        class="w-4 h-4 ml-1" viewBox="0 0 24 24">
+        <path d="M5 12h14M12 5l7 7-7 7"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
 <body>
   <p>This is a simple demo of generating code from blocks and running
-  the code in a sandboxed JavaScript interpreter.</p>
-
-  <p>&rarr; More info on <a href="https://developers.google.com/blockly/guides/configure/web/code-generators">Code Generators</a> and <a href="https://developers.google.com/blockly/guides/app-integration/running-javascript">Running JavaScript</a>.</p>
-
-  <p>
-    <button onclick="showCode()">Show JavaScript</button>
-    <button onclick="runCode()">Run JavaScript</button>
+    the code in a sandboxed JavaScript interpreter.</p>
+  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showCode()">Show
+    Python</button>
+  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    onclick="alert('Still in development')">Run
+    Python</button>
   </p>
 
   <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+  <div id="outputDiv">
+  </div>
 
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="Logic" colour="%{BKY_LOGIC_HUE}">
@@ -122,23 +146,53 @@
 
   <script>
     var demoWorkspace = Blockly.inject('blocklyDiv',
-        {media: 'https://unpkg.com/blockly/media/',
-         toolbox: document.getElementById('toolbox')});
+      {
+        media: 'https://unpkg.com/blockly/media/',
+        toolbox: document.getElementById('toolbox')
+      });
     Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),
-                               demoWorkspace);
+      demoWorkspace);
 
     function showCode() {
       // Generate JavaScript code and display it.
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var code = Blockly.Python.workspaceToCode(demoWorkspace);
-      alert(code);
+      var para;
+      var createdAlready = false;
+      if (document.getElementById("output") == null) {
+        console.log('here');
+        para = document.createElement("textarea");
+        createdAlready = false;
+      }
+      else {
+        para = document.getElementById("output");
+        createdAlready = true;
+      }
+
+      const node = document.createTextNode(code);
+      para.appendChild(node);
+
+      para.style.height = "auto";
+      para.style.height = (this.scrollHeight) + "px";
+
+      para.id = "output"
+
+      if (!createdAlready) {
+        const element = document.getElementById("outputDiv");
+        element.appendChild(para);
+      }
+
+      const tx = document.getElementsByTagName("textarea");
+      for (let i = 0; i < tx.length; i++) {
+        tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+      }
     }
 
     function runCode() {
       // Generate JavaScript code and run it.
       window.LoopTrap = 1000;
       Blockly.Python.INFINITE_LOOP_TRAP =
-          'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
+        'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
       var code = Blockly.Python.workspaceToCode(demoWorkspace);
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       try {
@@ -150,4 +204,5 @@
   </script>
 
 </body>
+
 </html>
