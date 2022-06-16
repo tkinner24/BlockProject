@@ -83,10 +83,9 @@
       <block type="math_arithmetic"></block>
       <block type="math_single"></block>
     </category>
+    
     <category name="Variables" colour="%{BKY_TEXTS_HUE}">
-      <block type="initialize"></block>
-      <block type="new_robot"></block>
-      <block type="end_initialize"></block>
+
     </category>
 
     <category name="Text" colour="%{BKY_TEXTS_HUE}">
@@ -94,10 +93,16 @@
       <block type="text_length"></block>
       <block type="text_print"></block>
     </category>
+
+    <category name="Robotarium" colur="%{BKY_LOGIC_HUE}">
+      <block type="initialize"></block>
+      <block type="new_robot"></block>
+      <block type="end_initialize"></block>
+    </category>
   </xml>
 
   <xml xmlns="https://developers.google.com/blockly/xml" id="startBlocks" style="display: none">
-    <block type="controls_if" inline="false" x="20" y="20">
+    <!-- <block type="controls_if" inline="false" x="20" y="20">
       <mutation else="1"></mutation>
       <value name="IF0">
         <block type="logic_compare" inline="true">
@@ -142,7 +147,7 @@
           </value>
         </block>
       </statement>
-    </block>
+    </block> -->
   </xml>
 
   <script>
