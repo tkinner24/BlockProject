@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Robotarium Blockly WIP</title>
-  
+  <!-- where all of the block files are found --> 
   <script src="./node_modules/blockly/blockly_compressed.js"></script>
   <script src="./node_modules/blockly/blocks_compressed.js"></script>
   <script src="./node_modules/blockly/python_compressed.js"></script>
@@ -46,8 +46,11 @@
   <div id="outputDiv">
   </div>
  
+  <!-- The individual blocks are imported to the menu --> 
 
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+
+      <!-- Logic imported --> 
     <category name="Logic" colour="%{BKY_LOGIC_HUE}">
       <block type="controls_if"></block>
       <block type="controls_ifelse"></block>
@@ -58,6 +61,9 @@
       <block type="logic_null"></block>
       <block type="logic_ternary"></block>      
     </category>
+
+     <!-- loops imported --> 
+
     <category name="Loops" colour="%{BKY_LOOPS_HUE}">
       <block type="controls_repeat_ext">
         <value name="TIMES">
@@ -72,6 +78,9 @@
       <block type="controls_forEach"></block>
       <block type="controls_flow_statements"></block>
     </category>
+
+      <!-- math imported --> 
+
     <category name="Math" colour="%{BKY_MATH_HUE}">
       <block type="math_number">
         <field name="NUM">123</field>
@@ -174,10 +183,10 @@
       </block>
     </category>
 
-<!--    <category name="Variables" colour="%{BKY_TEXTS_HUE}"> -->
+<!--    <category name="Variables" colour="%{BKY_TEXTS_HUE}">
 
-    </category>
-
+    </category> -->
+  <!-- Text Blocks Imported --> 
 
     <category name="Text" colour="%{BKY_TEXTS_HUE}">
       <block type="text"></block>
@@ -258,7 +267,7 @@
     </category>
 
 
-    
+      <!-- List Blocks Imported --> 
 
     <category name="Lists" colour="%{BKY_LISTS_HUE}">
       <block type="lists_create_with">
@@ -312,6 +321,8 @@
       <block type="lists_sort"></block>
     </category>
 
+      <!-- Color Blocks Imported --> 
+
     <category name="Colour" colour="%{BKY_COLOUR_HUE}">
       <block type="colour_picker"></block>
       <block type="colour_random"></block>
@@ -351,6 +362,7 @@
       </block>
     </category>
 
+      <!-- Robotarium Blocks Imported --> 
 
     <category name="Robotarium" colur="%{BKY_LOGIC_HUE}">
       <block type="initialize"></block>
