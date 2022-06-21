@@ -367,12 +367,11 @@
     <category name="Robotarium" colur="%{BKY_LOGIC_HUE}">
       <block type="initialize"></block>
       <block type="new_robot"></block>
-      <block type="end_initialize"></block>
       <block type="run_to_point"></block>
       <block type="run_to_point_and_angle"></block>
       <block type="display_image"></block>
       <block type="move_forward"></block>
-      <block type="turn"></block>
+      <block type="turn_by_angle"></block>
       <block type="end"></block>
       <block type="pen_down"></block>
     </category>
@@ -384,15 +383,11 @@
         <block type="new_robot">
           <field name="name">Bob</field>
           <next>
-            <block type="end_initialize">
-              <next>
                 <block type="run_to_point">
                   <next>
                     <block type="end"></block>
                   </next>
                 </block>
-              </next>
-            </block>
           </next>
         </block>
       </next>
