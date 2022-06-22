@@ -367,10 +367,10 @@
     <category name="Robotarium" colur="%{BKY_LOGIC_HUE}">
       <block type="new_robot"></block>
       <block type="run_to_point"></block>
-      <block type="run_to_point_and_angle"></block>
       <block type="display_image"></block>
       <block type="move_forward"></block>
       <block type="turn_by_angle"></block>
+      <block type="turn_to"></block>
       <block type="pen_down"></block>
     </category>
   </xml>
@@ -393,7 +393,8 @@
       // Generate JavaScript code and display it.
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      var initialize = `from turtle import position
+      var initialize = `
+from turtle import position
 import rps.robotarium as robotarium
 from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
@@ -506,8 +507,10 @@ def New_Robot(name, x,y,t):
     robotList.append(Robot(name,x,y,t))
 
 def Add_Target_Point(name, x,y,t):
-    robotList[namesList.index(name)].add_Target_Point(x,y,t)  `;
-      var end = `r = robotarium.Robotarium(number_of_robots=len(robotList), show_figure=True, initial_conditions=Fill_Start_Array(), sim_in_real_time=False)
+    robotList[namesList.index(name)].add_Target_Point(x,y,t)
+`;
+      var end = `
+r = robotarium.Robotarium(number_of_robots=len(robotList), show_figure=True, initial_conditions=Fill_Start_Array(), sim_in_real_time=False)
 unicycle_position_controller = create_hybrid_unicycle_pose_controller()
 uni_barrier_cert = create_unicycle_barrier_certificate()
 x = r.get_poses()
@@ -522,7 +525,8 @@ while time.time() < t_end:
     if(Check_if_All_Done()):
         break
 
-r.call_at_scripts_end()`;
+r.call_at_scripts_end()
+`;
       var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;
       var para;
       var createdAlready = false;
