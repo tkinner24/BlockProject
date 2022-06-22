@@ -13,10 +13,8 @@
   <script src="./node_modules/blockly/blocks/robotarium.js"></script>
   <script src="./node_modules/blockly/blocks/lists.js"></script>
   <script src="./node_modules/blockly/blocks/colour.js"></script>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 
   <style>
     body {
@@ -43,11 +41,15 @@
   <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
     onclick="alert('Still in development')">Run
     Python</button>
+    <a id="download" href="" download="output.py">
+      <button onclick="updateFile()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Download Python</button>
+    </a>
   </p>
 
-  <div id="blocklyDiv" style="height: 480px; width: 80%;"></div>
-  <a id="download" href="" download="output.py">Download</a>
-  <pre><code class="python" id = "code"></code></pre>
+  <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
+  
+
+  <pre class="prettyprint" id = "code"></pre>
  
   <!-- The individual blocks are imported to the menu --> 
 
@@ -391,9 +393,8 @@
       });
     Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),
       demoWorkspace);
-
-    function showCode() {
-      // Generate JavaScript code and display it.
+    
+    function updateFile(){
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
       var initialize = `from turtle import position
@@ -450,7 +451,7 @@ class Robot:
         return self.output_points
 
     def angle_In_Range(self, angle, accuracy = .07):
-        if((self.target_points[self.currentPoint][2]-accuracy<angle<self.target_points[self.currentPoint][2]+accuracy)):
+        if((self.target_points[self.currentPoint][2]-accuracy< angle< self.target_points[self.currentPoint][2]+accuracy)):
             return True
         else:
             return False
@@ -529,13 +530,8 @@ while time.time() < t_end:
 
 r.call_at_scripts_end()
 `;
-      var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;
-      document.getElementById("code").style.height = "1000px";
-      document.getElementById("code").innerHTML = code;
-      
-
-
-      var pythonFile = null;
+var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;
+var pythonFile = null;
       console.log(code);
       var data = new Blob([code], { type: 'text/x-python' });
 
@@ -546,6 +542,17 @@ r.call_at_scripts_end()
       pythonFile = window.URL.createObjectURL(data);
 
       document.getElementById("download").href = pythonFile;
+      return code;
+    }
+
+
+    function showCode() {
+      updateFile();
+      
+      
+      document.getElementById("code").style.height = "auto";
+      document.getElementById("code").innerHTML = updateFile();
+    
     }
 
     function runCode() {
