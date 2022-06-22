@@ -13,7 +13,10 @@
   <script src="./node_modules/blockly/blocks/robotarium.js"></script>
   <script src="./node_modules/blockly/blocks/lists.js"></script>
   <script src="./node_modules/blockly/blocks/colour.js"></script>
-
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 
   <style>
     body {
@@ -30,6 +33,7 @@
       width: 50%;
     }
   </style>
+  
 </head>
 
 <body>
@@ -43,8 +47,7 @@
 
   <div id="blocklyDiv" style="height: 480px; width: 80%;"></div>
   <a id="download" href="" download="output.py">Download</a>
-  <div id="outputDiv">
-  </div>
+  <pre><code class="python" id = "code"></code></pre>
  
   <!-- The individual blocks are imported to the menu --> 
 
@@ -393,8 +396,7 @@
       // Generate JavaScript code and display it.
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      var initialize = `
-from turtle import position
+      var initialize = `from turtle import position
 import rps.robotarium as robotarium
 from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
@@ -528,38 +530,10 @@ while time.time() < t_end:
 r.call_at_scripts_end()
 `;
       var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;
-      var para;
-      var createdAlready = false;
-      if (document.getElementById("output") == null) {
-        console.log('here');
-        para = document.createElement("textarea");
-        createdAlready = false;
-      }
-      else {
-        para = document.getElementById("output");
-        para.innerHTML = "";
-        createdAlready = true;
-      }
+      document.getElementById("code").style.height = "1000px";
+      document.getElementById("code").innerHTML = code;
+      
 
-      const node = document.createTextNode(code);
-      para.appendChild(node);
-
-      para.style.height = "auto";
-      para.style.height = (this.scrollHeight) + "px";
-
-
-
-      para.id = "output"
-
-      if (!createdAlready) {
-        const element = document.getElementById("outputDiv");
-        element.appendChild(para);
-      }
-
-      const tx = document.getElementsByTagName("textarea");
-      for (let i = 0; i < tx.length; i++) {
-        tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
-      }
 
       var pythonFile = null;
       console.log(code);
