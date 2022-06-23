@@ -555,6 +555,8 @@ while time.time() < t_end:
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
 
+
+    #draws names
     for robotname in namesList:
       nameindex = namesList.index(robotname)
       robot_labels[nameindex].set_position([xi[0,nameindex],xi[1,nameindex]+0.15])
