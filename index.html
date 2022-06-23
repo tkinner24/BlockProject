@@ -545,11 +545,6 @@ r.step()
 robot_labels = [r.axes.text(x[0,namesList.index(kk)],x[1,namesList.index(kk)]+0.15,kk,fontsize=8, color=robotColorsList[namesList.index(kk)],fontweight='bold',horizontalalignment='center',verticalalignment='center',zorder=0)
 for kk in namesList]
 
-#for robotname in namesList:
-#      nameindex = namesList.index(robotname)
-#      print(nameindex)
-#      robot_labels.append([r.axes.text(x[0,nameindex],x[1,nameindex]+0.15,robotname, fontsize=8, color=robotColorsList[nameindex],fontweight='bold',horizontalalignment='center',verticalalignment='center',zorder=0)])
-#      print(robot_labels)
 
 
 while time.time() < t_end:
