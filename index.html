@@ -64,6 +64,7 @@
   </table>
   
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
+  <iFrame src="https://simulator-server.herokuapp.com/static/uploads/video.mp4"></iFrame>
   
 
   <pre class="prettyprint" id = "code"></pre>
@@ -612,9 +613,10 @@ var pythonFile = null;
       // document.getElementById("swapper-first").style.display = "none"
       // document.getElementById("swapper-other").style.display = "block"
       fetch("https://simulator-server.herokuapp.com/simulationVideo", requestOptions)
-        .then(response => response.text())
-        .then(result => console.log(result))
+        .then(console.log("sent"))
+        .then(console.log("recived"))
         .catch(error => console.log('error', error));
+        
     }
   </script>
 
