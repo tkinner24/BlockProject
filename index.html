@@ -47,13 +47,7 @@
             <a id="download" href="" download="output.py">
               <button onclick="updateFile()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Download Python</button>
             </a>
-            <iframe id="my_iframe" style="display:none;"></iframe>
-              <script>
-              function Download(url) {
-                  document.getElementById('my_iframe').src = url;
-              };
-              </script>
-              <button onclick="Download('https://simulator-server.herokuapp.com/static/uploads/video.mp4')">Download Video</button>
+                     
         </p>
       </td>
       <td style="width: 35%"></td>
@@ -414,9 +408,8 @@
     function updateFile(){
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      var rpsString = "import rps.robotarium as robotarium";
-      
       var initialize = `
+import robotarium as robotarium
 from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
 from rps.utilities.misc import *
@@ -572,7 +565,7 @@ r.call_at_scripts_end()
 `;
 var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;
 var pythonFile = null;
-      var data = new Blob([rpsString+code], { type: 'text/x-python' });
+      var data = new Blob([code], { type: 'text/x-python' });
 
       if (pythonFile !== null) {
         window.URL.revokeObjectURL(pythonFile);
@@ -586,12 +579,11 @@ var pythonFile = null;
 
 
     function showCode() {
-      var rpsString = "import rps.robotarium as robotarium";
       updateFile();
       
       
       document.getElementById("code").style.height = "auto";
-      document.getElementById("code").innerHTML = rpsString + updateFile();
+      document.getElementById("code").innerHTML = updateFile();
     
     }
 
@@ -600,8 +592,7 @@ var pythonFile = null;
 
     function simCode() {
       var formdata = new FormData();
-      var rpsStirngNorps = "import robotarium as robotarium";
-      formdata.append("code", rpsStirngNorps + updateFile());
+      formdata.append("code", updateFile());
       var requestOptions = {
         mode: 'no-cors',
         method: 'POST',
@@ -613,6 +604,8 @@ var pythonFile = null;
       // document.getElementById("swapper-other").style.display = "block"
       fetch("https://simulator-server.herokuapp.com/simulationVideo", requestOptions)
         .then(response => response.text())
+        // document.getElementById("swapper-first").style.display = "block"
+        // document.getElementById("swapper-other").style.display = "none"
         .then(result => console.log(result))
         .catch(error => console.log('error', error));
     }
