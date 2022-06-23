@@ -534,7 +534,7 @@ _,uni_to_si_states = create_si_to_uni_mapping()
 x = r.get_poses()
 r.step()
 
-robot_labels = [r.axes.text(x[0,namesList.index(kk)],x[1,namesList.index(kk)]+0.15,kk,fontsize=8, color=robotColorsList[nameindex],fontweight='bold',horizontalalignment='center',verticalalignment='center',zorder=0)
+robot_labels = [r.axes.text(x[0,namesList.index(kk)],x[1,namesList.index(kk)]+0.15,kk,fontsize=8, color=robotColorsList[namesList.index(kk)],fontweight='bold',horizontalalignment='center',verticalalignment='center',zorder=0)
 for kk in namesList]
 
 #for robotname in namesList:
