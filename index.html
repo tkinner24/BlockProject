@@ -35,16 +35,27 @@
 </head>
 
 <body>
-  <p>This is a work in progress of a block coding interface for the Georgia Tech Robotarium</p>
-  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showCode()">Show
-    Python</button>
-  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-    onclick="alert('Still in development')">Run
-    Python</button>
-    <a id="download" href="" download="output.py">
-      <button onclick="updateFile()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Download Python</button>
-    </a>
-  </p>
+  <table>
+    <tr>
+      <td>
+        <p>This is a work in progress of a block coding interface for the Georgia Tech Robotarium</p>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showCode()">Show
+            Python</button>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onclick="alert('Still in development')">Run
+            Python</button>
+            <a id="download" href="" download="output.py">
+              <button onclick="updateFile()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Download Python</button>
+            </a>
+        </p>
+      </td>
+      <td style="width: 35%"></td>
+      <td>
+        <img src="robotarium_header.png" style="height: 90px; float: right">
+      </td>
+    </tr>
+  </table>
+  
 
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
   
