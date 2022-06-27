@@ -41,14 +41,10 @@
     <tr>
       <td>
         <p>This is a work in progress of a block coding interface for the Georgia Tech Robotarium</p>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showCode()">Show
-            Python</button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onclick="simCode()">Simulate
-            Python</button>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showCode()">Show Python</button>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="simCode()">Simulate Python</button>
             <a id="download" download="output.py" style="color:white">
-              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="updateFile()">Download 
-              Python</button>
+              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="updateFile()">Download Python</button>
             </a>
             <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1" style="width: 30px; height: 30px; margin:-10px; margin-left: 5px;">
         </p>
@@ -62,12 +58,10 @@
   
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
   <iFrame id="video" src="https://robotarium-simulator.herokuapp.com/static/uploads/video.mp4" style="width:100%; height:500px;display: none"></iFrame>
-  
-
   <pre class="prettyprint" id = "code"></pre>
  
   <!-- The individual blocks are imported to the menu --> 
-
+  <!-- This xml file is all of the blocks that will be in the toolbox on the left-->
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
 
       <!-- Logic imported --> 
@@ -395,19 +389,27 @@
     </category>
   </xml>
 
+  <!-- This xml file is the starting blocks that defalt in the begining-->
   <xml xmlns="https://developers.google.com/blockly/xml" id="startBlocks" style="display: none">
-    
+    <block type="new_robot">
+      <field name="name">Bob</field>
+      <next>
+        <block type="run_to_point">
+          <field name="target_x">.8</field>
+          <field name="target_y">.8</field>
+        </block>
+      </next>
+    </block> 
   </xml>
 
   <script>
-
     var demoWorkspace = Blockly.inject('blocklyDiv',
       {
         media: 'https://unpkg.com/blockly/media/',
         toolbox: document.getElementById('toolbox')
       });
-    Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),
-      demoWorkspace);
+
+    Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),demoWorkspace);
     
     function updateFile(){
       Blockly.Python.INFINITE_LOOP_TRAP = null;
