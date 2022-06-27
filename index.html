@@ -514,6 +514,7 @@ robotList = []
 namesList = []
 robotColorsList = []
 robot_labels = []
+robotLines = []
 t_end = time.time() + 60 * 5
 drawing = -1
 drawingType = "Actual"
@@ -541,6 +542,7 @@ def New_Robot(name, x,y,t,color,drawing):
     namesList.append(name)
     robotList.append(Robot(name,x,y,t,drawing))
     robotColorsList.append(color)
+    robotLines.append([])
 
 def Add_Target_Point(name, x,y,t,drawing):
     robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing)
@@ -562,7 +564,28 @@ for kk in namesList]
 ii = 0
 drawFrame = False
 
+if drawingType == "Ideal":
+    lineStepCache = []
+    for nn in robotList:
+        lineStepCache.append(0)
+
 while time.time() < t_end:
+  
+    if drawingType == "Ideal":
+        for i in range(len(robotList)):
+          if robotList[i].get_Status() == False:
+            if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1:
+              if lineStepCache[i] != robotList[i].currentPoint:
+                tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
+                tempColor = "#" + tempColor[2:]
+                while len(tempColor) != 7: 
+                  tempColor = tempColor[:2] + "0" + tempColor[2:]
+                robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6)
+                lineStepCache[i] = robotList[i].currentPoint
+              else:
+                robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]])
+    
+
     x = r.get_poses()
     xi =  uni_to_si_states(x)
 
@@ -576,7 +599,9 @@ while time.time() < t_end:
           if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1  and ii == 0 :
             tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
             tempColor = "#" + tempColor[2:]
-            r.axes.plot(x[0][i],x[1][i],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6, zorder=-10)
+            while len(tempColor) != 7: 
+                  tempColor = tempColor[:2] + "0" + tempColor[2:]
+            r.axes.plot(x[0][i],x[1][i],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6)
             drawFrame = True
           
       
@@ -586,13 +611,7 @@ while time.time() < t_end:
       if ii > 0:
         ii -= 1
     
-    if drawingType == "Ideal":
-      for i in range(len(robotList)):
-        if robotList[i].get_Status() == True:
-          print("nothing?")
-        else:
-          print("aaaaah")
-    
+  
 
 
     #draws names
