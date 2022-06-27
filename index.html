@@ -415,6 +415,7 @@
       var rpsString = "import rps.robotarium as robotarium";
       
       var initialize = `
+import rps.robotarium as robotarium
 from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
 from rps.utilities.misc import *
@@ -426,7 +427,7 @@ import math
 
 class Robot:
 
-    def __init__(self, name, x, y, t):
+    def __init__(self, name, x, y, t, drawing):
         self.target_points = []
         self.currentPoint = 0
         self.totalPoints = 0
@@ -437,16 +438,16 @@ class Robot:
             t=t-360
         theta = t * 3.14/180
         self.name = name
-        self.start_array = np.array([[x],[y],[theta]])
-        self.target_points.append((x,y,theta))
-        self.output_points = np.array([[x],[y],[theta]])
+        self.start_array = np.array([[x],[y],[theta],[drawing]])
+        self.target_points.append((x,y,theta,drawing))
+        self.output_points = np.array([[x],[y],[theta],[drawing]])
     
-    def add_Target_Point(self,x,y,t):
+    def add_Target_Point(self,x,y,t,drawing):
         self.totalPoints = self.totalPoints + 1
         t=t%360
         if(t>180):
             t=t-360
-        self.target_points.append((x,y,t*3.14/180))
+        self.target_points.append((x,y,t*3.14/180,drawing))
 
     def get_Target_Points(self):
         return self.target_points
@@ -455,6 +456,7 @@ class Robot:
         self.output_points[0] = self.target_points[self.currentPoint][0]
         self.output_points[1] = self.target_points[self.currentPoint][1]
         self.output_points[2] = self.target_points[self.currentPoint][2]
+        self.output_points[3] = self.target_points[self.currentPoint][3]
     
     def step_Current_Point(self):
         self.currentPoint = self.currentPoint + 1
@@ -483,13 +485,13 @@ class Robot:
     def get_Status(self):
         return self.finished
 
-    def move_Forward(self, distance):
+    def move_Forward(self, distance, drawing):
         curX = self.target_points[self.totalPoints][0]
         curY = self.target_points[self.totalPoints][1]
         curT = self.target_points[self.totalPoints][2]
         addX = distance * math.cos(curT)
         addY = distance * math.sin(curT)
-        self.add_Target_Point((curX+addX),(curY+addY),(curT*180/3.14))
+        self.add_Target_Point((curX+addX),(curY+addY),(curT*180/3.14),drawing)
     
     def turn(self,by):
           curX = self.target_points[self.totalPoints][0]
@@ -503,15 +505,16 @@ namesList = []
 robotColorsList = []
 robot_labels = []
 t_end = time.time() + 60 * 5
+drawing = -1
 
 def Fill_Start_Array():
-    start_Array = np.array([[],[],[]])
+    start_Array = np.array([[],[],[],[]])
     for robot in robotList:
         start_Array = np.append(start_Array,robot.get_Output_Points(), axis = 1)
     return start_Array
 
 def Update_Target_Array(pos):
-    target_Array = np.array([[],[],[]])
+    target_Array = np.array([[],[],[],[]])
     for i in range(len(robotList)):
         robotList[i].check_Position(i,pos)
         target_Array = np.append(target_Array,robotList[i].get_Output_Points(), axis = 1)
@@ -523,16 +526,17 @@ def Check_if_All_Done():
             return False
     return True
 
-def New_Robot(name, x,y,t,color):
+def New_Robot(name, x,y,t,color,drawing):
     namesList.append(name)
-    robotList.append(Robot(name,x,y,t))
+    robotList.append(Robot(name,x,y,t,drawing))
     robotColorsList.append(color)
 
-def Add_Target_Point(name, x,y,t):
-    robotList[namesList.index(name)].add_Target_Point(x,y,t)
+def Add_Target_Point(name, x,y,t,drawing):
+    robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing)
 `;
       var end = `
-r = robotarium.Robotarium(number_of_robots=len(robotList), show_figure=True, initial_conditions=Fill_Start_Array(), sim_in_real_time=False)
+start_Array = Fill_Start_Array()
+r = robotarium.Robotarium(number_of_robots=len(robotList), show_figure=True, initial_conditions=start_Array[0:3][:], sim_in_real_time=False)
 unicycle_position_controller = create_hybrid_unicycle_pose_controller()
 uni_barrier_cert = create_unicycle_barrier_certificate()
 _,uni_to_si_states = create_si_to_uni_mapping()
@@ -542,12 +546,8 @@ r.step()
 robot_labels = [r.axes.text(x[0,namesList.index(kk)],x[1,namesList.index(kk)]+0.15,kk,fontsize=8, color=robotColorsList[namesList.index(kk)],fontweight='bold',horizontalalignment='center',verticalalignment='center',zorder=0)
 for kk in namesList]
 
-#for robotname in namesList:
-#      nameindex = namesList.index(robotname)
-#      print(nameindex)
-#      robot_labels.append([r.axes.text(x[0,nameindex],x[1,nameindex]+0.15,robotname, fontsize=8, color=robotColorsList[nameindex],fontweight='bold',horizontalalignment='center',verticalalignment='center',zorder=0)])
-#      print(robot_labels)
 
+ii = 0
 
 while time.time() < t_end:
     x = r.get_poses()
@@ -556,7 +556,23 @@ while time.time() < t_end:
     dxu = unicycle_position_controller(x, Update_Target_Array(x))
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
+    
+    for i in range(len(robotList)):
+      if robotList[i].get_Status() == False:
+        if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1  and ii == 0 :
+          print(robotList[i].get_Target_Points()[robotList[i].currentPoint][3])
+          tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
+          print (tempColor)
+          tempColor = "#" + tempColor[2:]
+          r.axes.plot(x[0],x[1],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6)
+          ii = 20
+    if ii > 0:
+      ii -= 1
+    
+    
 
+
+    #draws names
     for robotname in namesList:
       nameindex = namesList.index(robotname)
       robot_labels[nameindex].set_position([xi[0,nameindex],xi[1,nameindex]+0.15])
