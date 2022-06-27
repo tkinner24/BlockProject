@@ -563,7 +563,7 @@ while time.time() < t_end:
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
     
-    if drawingType == "Actual"
+    if drawingType == "Actual":
       for i in range(len(robotList)):
         if robotList[i].get_Status() == False:
           if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1  and ii == 0 :
