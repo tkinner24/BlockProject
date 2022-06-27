@@ -387,7 +387,7 @@
       <block type="turn_to"></block>
       <block type="pen_down"></block>
       <block type="pen_up"></block>
-
+      <block type="drawing_type"></block>
     </category>
   </xml>
 
@@ -510,6 +510,7 @@ robotColorsList = []
 robot_labels = []
 t_end = time.time() + 60 * 5
 drawing = -1
+drawingType = "Ideal"
 
 def Fill_Start_Array():
     start_Array = np.array([[],[],[],[]])
@@ -561,21 +562,28 @@ while time.time() < t_end:
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
     
-    for i in range(len(robotList)):
-      if robotList[i].get_Status() == False:
-        if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1  and ii == 0 :
-          tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
-          tempColor = "#" + tempColor[2:]
-          r.axes.plot(x[0][i],x[1][i],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6)
-          drawFrame = True
-        
+    if drawingType == "Actual"
+      for i in range(len(robotList)):
+        if robotList[i].get_Status() == False:
+          if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1  and ii == 0 :
+            tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
+            tempColor = "#" + tempColor[2:]
+            r.axes.plot(x[0][i],x[1][i],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6)
+            drawFrame = True
+          
+      
+      if(drawFrame):
+        ii = 20
+        drawFrame = False
+      if ii > 0:
+        ii -= 1
     
-    if(drawFrame):
-      ii = 20
-      drawFrame = False
-    if ii > 0:
-      ii -= 1
-    
+    if drawingType == "Ideal"
+      for i in range(len(robotList)):
+        if robotList[i].get_Status() == False:
+          print("nothing?")
+        else:
+          print("aaaaah")
     
 
 
