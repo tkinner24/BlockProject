@@ -482,10 +482,13 @@ class Robot:
         return self.output_points
 
     def angle_In_Range(self, angle, accuracy = .07):
-        if((self.target_points[self.currentPoint][2]-accuracy< angle< self.target_points[self.currentPoint][2]+accuracy)):
-            return True
-        else:
-            return False
+      if((self.target_points[self.currentPoint][2]-accuracy<angle<self.target_points[self.currentPoint][2]+accuracy)):
+              return True     
+      elif(self.target_points[self.currentPoint][2] == 3.14):
+          if(3.14-accuracy<math.fabs(angle)<3.14+accuracy):
+              return True
+      else:
+          return False
 
     def check_Position(self,robot_num, pos, accuracy = .03):
         if(not self.finished):
