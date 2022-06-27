@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Robot Block</title>
+    <link rel="icon" href="robotariam_icon.png">
+    <style>
+        body {
+        font-family: "Lato", sans-serif;
+        }
+
+        .sidenav {
+        height: 100%;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 10;
+        background-color: #111;
+        overflow-x: hidden;
+        padding-top: 60px;
+        }
+
+        .sidenav a {
+        padding: 5px 5px 5px 32px;
+        text-decoration: none;
+        font-size: 20px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+        }
+
+        .sidenav h2 {
+        padding: 1px 1px 1px 32px;
+        margin: 10px;
+        margin-left: -5px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #a0a0a0;
+        display: block;
+        transition: 0.3s;
+        }
+
+        .sidenav a:hover {
+        color: #f1f1f1;
+        }
+
+        .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+        }
+
+        @media screen and (max-height: 450px) {
+        .sidenav {padding-top: 15px;}
+        .sidenav a {font-size: 18px;}
+        }
+
+        #content {
+            margin-left: 260px;
+        }
+
+        .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 40%;
+        }
+
+        #centerText{
+            text-align: center;
+        }
+    </style>
+</head>
+<body style="height: 100%; overflow: hidden">
+
+<div id="mySidenav" class="sidenav">
+    <h2>Universal</h2>
+  <a href="DisplayImageDoc.html">Display Image</a>
+  <a href="DrawingDoc.html">Drawing Type</a>
+    <h2>Robot</h2>
+  <a href="NewRobotDoc.html">New Robot</a>
+  <a href="MoveToPoint.html">Move to Point</a>
+  <a href="MoveToPointAngle.html">Move to Point and Angle</a>
+  <a href="MoveForward.html">Move Forward</a>
+  <a href="Turn.html">Turn</a>
+  <a href="TurnTo.html">Turn To</a>
+  <a href="PenDown.html">Pen Down</a>
+  <a href="PenUp.html">Pen Up</a>
+</div>
+<div id="content">
+    <h2>Move to Point Block</h2>
+    <p id="centerText">The "New Robot" block creates a robot in the enviroment. When the block is placed you need to give the robot a name, starting point, and angle. You need to place a new robot block for every robot you want in your program.</p>
+    <image src="MoveToPointPic.png" class="center"></image>
+</div>
+<script>
+</script>
+   
+</body>
+</html>
