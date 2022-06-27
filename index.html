@@ -506,12 +506,17 @@ class Robot:
         addY = distance * math.sin(curT)
         self.add_Target_Point((curX+addX),(curY+addY),(curT*180/3.14),drawing)
     
-    def turn(self,by):
+    def turn(self,by,drawing):
           curX = self.target_points[self.totalPoints][0]
           curY = self.target_points[self.totalPoints][1]
           curT = self.target_points[self.totalPoints][2]*180/3.14
           curT = (curT + by)%360
-          self.add_Target_Point((curX),(curY),(curT))
+          self.add_Target_Point((curX),(curY),(curT),drawing)
+
+    def turn_To(self,to,drawing):
+        curX = self.target_points[self.totalPoints][0]
+        curY = self.target_points[self.totalPoints][1]
+        self.add_Target_Point((curX),(curY),(to),drawing)
 
 robotList = []
 namesList = []
@@ -583,7 +588,7 @@ while time.time() < t_end:
                 tempColor = "#" + tempColor[2:]
                 while len(tempColor) != 7: 
                   tempColor = tempColor[:2] + "0" + tempColor[2:]
-                robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6)
+                robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6,zorder=10)
                 lineStepCache[i] = robotList[i].currentPoint
               else:
                 robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]])
@@ -609,7 +614,7 @@ while time.time() < t_end:
           
       
       if(drawFrame):
-        ii = 5
+        ii = 10
         drawFrame = False
       if ii > 0:
         ii -= 1
