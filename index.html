@@ -586,7 +586,7 @@ while time.time() < t_end:
                 robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6)
                 lineStepCache[i] = robotList[i].currentPoint
               else:
-                robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]])
+                robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
     
 
     x = r.get_poses()
