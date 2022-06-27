@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Robotarium Blockly WIP</title>
-
+  <link rel="icon" href="robotariam_icon.png">
   <!-- where all of the block files are found --> 
   <script src="./node_modules/blockly/blockly_compressed.js"></script>
   <script src="./node_modules/blockly/blocks_compressed.js"></script>
@@ -40,9 +40,9 @@
   <table>
     <tr>
       <td>
-        <p>This is a work in progress of a block coding interface for the Georgia Tech Robotarium</p>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="showCode()">Show Python</button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="simCode()">Simulate Python</button>
+        <p id="para">This is a work in progress of a block coding interface for the Georgia Tech Robotarium</p>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton" onclick="flipCode()">Show Python</button>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton" onclick="simCode()">Simulate Python</button>
             <a id="download" download="output.py" style="color:white">
               <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="updateFile()">Download Python</button>
             </a>
@@ -337,7 +337,7 @@
 
       <!-- Color Blocks Imported --> 
 
-    <category name="Colour" colour="%{BKY_COLOUR_HUE}">
+    <category name="Color" colour="%{BKY_COLOUR_HUE}">
       <block type="colour_picker"></block>
       <block type="colour_random"></block>
       <block type="colour_rgb">
@@ -381,17 +381,23 @@
 
       <!-- Robotarium Blocks Imported --> 
 
-    <category name="Robotarium" colur="%{BKY_LOGIC_HUE}">
-      <block type="new_robot"></block>
-      <block type="run_to_point"></block>
+    <category name="Universal" colour="%{BKY_LOOPS_HUE}">
       <block type="display_image"></block>
+      <block type="drawing_type"></block>
+    </category>
+
+    <category name="Robot" colour="%{BKY_MATH_HUE}">
+      <block type="new_robot"></block>
+      <block type="run_to_point_and_angle"></block>
+      <block type="run_to_point"></block>
       <block type="move_forward"></block>
       <block type="turn_by_angle"></block>
       <block type="turn_to"></block>
       <block type="pen_down"></block>
       <block type="pen_up"></block>
-      <block type="drawing_type"></block>
     </category>
+
+
   </xml>
 
   <!-- This xml file is the starting blocks that defalt in the begining-->
@@ -603,7 +609,7 @@ while time.time() < t_end:
           
       
       if(drawFrame):
-        ii = 20
+        ii = 5
         drawFrame = False
       if ii > 0:
         ii -= 1
@@ -633,13 +639,23 @@ r.call_at_scripts_end()
         pythonFile = window.URL.createObjectURL(data);
         document.getElementById("download").href = pythonFile;
         return code;
-}
+  }
 
-  function showCode() {//Shows code at bottom of screen
+  showCode = true;
+  function flipCode() {//Shows code at bottom of screen
+    if(showCode){
       var rpsString = "import rps.robotarium as robotarium";
       updateFile();
       document.getElementById("code").style.height = "auto";
       document.getElementById("code").innerHTML = rpsString + updateFile();
+      showCode = !showCode;
+      document.getElementById('ShowPButton').innerHTML = "Hide Python";
+    }else{
+      showCode = !showCode;
+      document.getElementById('ShowPButton').innerHTML = "Show Python";
+      document.getElementById("code").style.height = "auto";
+      document.getElementById("code").innerHTML = "";
+    }
   }
   
   function recived(){//When recived 
@@ -654,18 +670,20 @@ r.call_at_scripts_end()
       }, 6000)
   }
 
-  // function pingBackend(){
-  //   document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
-  //   var requestOptions = {
-  //     mode: 'no-cors',
-  //     method: 'GET',
-  //     redirect: 'follow'
-  //   };
-  //   fetch("https://simulator-server.herokuapp.com", requestOptions)
-  //     .then(response => response.text())
-  //     .then(result =>console.long(response))
-  //     .catch(error => console.log('error', error));
-  // }
+  function pingBackend(){
+    document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
+    document.getElementById("RPButton").style.width = "0px"
+    document.getElementById("RPButton").style.display = "none"
+    // var requestOptions = {
+    //   mode: 'no-cors',
+    //   method: 'GET',
+    //   redirect: 'follow'
+    // };
+    // fetch("https://simulator-server.herokuapp.com", requestOptions)
+    //   .then(response => response.text())
+    //   .then(result =>console.long(response))
+    //   .catch(error => console.log('error', error));
+  }
 
   function simCode() { //When Simulate Code is clicked send code to server to run simulation
       var formdata = new FormData();
