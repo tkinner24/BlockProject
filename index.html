@@ -4,15 +4,19 @@
 <head>
   <meta charset="utf-8">
   <title>Robotarium Blockly WIP</title>
+
   <!-- where all of the block files are found --> 
   <script src="./node_modules/blockly/blockly_compressed.js"></script>
   <script src="./node_modules/blockly/blocks_compressed.js"></script>
   <script src="./node_modules/blockly/python_compressed.js"></script>
   <script src="./node_modules/blockly/msg/en.js"></script>
-  <script src="./node_modules/blockly/generators/python/robotarium.js"></script>
-  <script src="./node_modules/blockly/blocks/robotarium.js"></script>
   <script src="./node_modules/blockly/blocks/lists.js"></script>
   <script src="./node_modules/blockly/blocks/colour.js"></script>
+
+  <!--This where the python that creates the output of the custom blocks-->
+  <script src="./node_modules/blockly/generators/python/robotarium.js"></script>
+  <!--This where the JSON that creates the visual of the custom blocks-->
+  <script src="./node_modules/blockly/blocks/robotarium.js"></script>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 
@@ -21,12 +25,10 @@
       background-color: #fff;
       font-family: sans-serif;
     }
-
     h1 {
       font-weight: normal;
       font-size: 140%;
     }
-
     textarea {
       width: 50%;
     }
@@ -34,7 +36,7 @@
   
 </head>
 
-<body>
+<body onload="pingBackend()">
   <table>
     <tr>
       <td>
@@ -44,27 +46,22 @@
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onclick="simCode()">Simulate
             Python</button>
-            <a id="download" href="" download="output.py">
-              <button onclick="updateFile()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Download Python</button>
+            <a id="download" download="output.py" style="color:white">
+              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="updateFile()">Download 
+              Python</button>
             </a>
-            <iframe id="my_iframe" style="display:none;"></iframe>
-              <script>
-              function Download(url) {
-                  document.getElementById('my_iframe').src = url;
-              };
-              </script>
-              <button onclick="Download('https://simulator-server.herokuapp.com/static/uploads/video.mp4')">Download Video</button>
+            <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1" style="width: 30px; height: 30px; margin:-10px; margin-left: 5px;">
         </p>
       </td>
       <td style="width: 35%"></td>
       <td>
-        <img src="robotarium_header.png" style="height: 90px; float: right">
+        <img src="robotarium_header.png" sizes="" style="height: 90px; float: right">
       </td>
     </tr>
   </table>
   
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
-  <iFrame src="https://simulator-server.herokuapp.com/static/uploads/video.mp4"></iFrame>
+  <iFrame id="video" src="https://robotarium-simulator.herokuapp.com/static/uploads/video.mp4" style="width:100%; height:500px;display: none"></iFrame>
   
 
   <pre class="prettyprint" id = "code"></pre>
@@ -590,7 +587,7 @@ var pythonFile = null;
       var rpsString = "import rps.robotarium as robotarium";
       updateFile();
       
-      
+
       document.getElementById("code").style.height = "auto";
       document.getElementById("code").innerHTML = rpsString + updateFile();
     
@@ -598,9 +595,37 @@ var pythonFile = null;
 
   
 
+    function recived(){//When recived 
+      const myTimeout = setTimeout(function(){
+        var code = document.getElementById('video');
+      code.src = code.src;
+  
+      document.getElementById("video").style.display = "block"
+
+      var code = document.getElementById('video');
+      code.src = code.src;
+      document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
+      window.scrollTo(0, document.body.scrollHeight);
+    }, 6000)
+    }
+
+    function pingBackend(){
+      document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
+      var requestOptions = {
+        mode: 'no-cors',
+        method: 'GET',
+        redirect: 'follow'
+      };
+      fetch("https://simulator-server.herokuapp.com", requestOptions)
+        .then(response => response.text())
+        .then(result =>console.long(response))
+        .catch(error => console.log('error', error));
+    }
 
     function simCode() {
       var formdata = new FormData();
+      document.getElementById("video").style.display = "none"
+      document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"
       var rpsStirngNorps = "import robotarium as robotarium";
       formdata.append("code", rpsStirngNorps + updateFile());
       var requestOptions = {
@@ -609,13 +634,15 @@ var pythonFile = null;
         body: formdata,
         redirect: 'follow'
       };
-      // document.getElementById("bigSwap").style.display = "block"
-      // document.getElementById("swapper-first").style.display = "none"
-      // document.getElementById("swapper-other").style.display = "block"
+      try{
       fetch("https://simulator-server.herokuapp.com/simulationVideo", requestOptions)
-        .then(response => response.text())
-        .then(result => console.log(result + "recived"))
-        .catch(error => console.log('error', error));
+        .then(result => recived())
+        .catch((error) => {
+          alert("There has been an error in the server, please try again later")
+        });
+      }catch(err){
+        alert("There has been an error in the server, please try again later")
+      }
         
     }
   </script>
