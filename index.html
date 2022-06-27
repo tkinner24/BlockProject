@@ -417,7 +417,7 @@
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
       var rpsString = "import rps.robotarium as robotarium";
-      
+      //This String goes before any block code and initializes everything
       var initialize = `
 import rps.robotarium as robotarium
 from rps.utilities.transformations import *
@@ -539,6 +539,7 @@ def New_Robot(name, x,y,t,color,drawing):
 def Add_Target_Point(name, x,y,t,drawing):
     robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing)
 `;
+//This String goes after all of the block code and it has all of the running parts
       var end = `
 start_Array = Fill_Start_Array()
 r = robotarium.Robotarium(number_of_robots=len(robotList), show_figure=True, initial_conditions=start_Array[0:3][:], sim_in_real_time=False)
@@ -599,74 +600,64 @@ while time.time() < t_end:
 
 r.call_at_scripts_end()
 `;
-var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;
-var pythonFile = null;
-      var data = new Blob([rpsString+code], { type: 'text/x-python' });
 
-      if (pythonFile !== null) {
-        window.URL.revokeObjectURL(pythonFile);
-      }
+  var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
+  var pythonFile = null;//creates python file
+        var data = new Blob([rpsString+code], { type: 'text/x-python' });
+        if (pythonFile !== null) {
+          window.URL.revokeObjectURL(pythonFile);
+        }
+        pythonFile = window.URL.createObjectURL(data);
+        document.getElementById("download").href = pythonFile;
+        return code;
+}
 
-      pythonFile = window.URL.createObjectURL(data);
-
-      document.getElementById("download").href = pythonFile;
-      return code;
-    }
-
-
-    function showCode() {
+  function showCode() {//Shows code at bottom of screen
       var rpsString = "import rps.robotarium as robotarium";
       updateFile();
-      
-
       document.getElementById("code").style.height = "auto";
       document.getElementById("code").innerHTML = rpsString + updateFile();
-    
-    }
-
+  }
   
-
-    function recived(){//When recived 
-      const myTimeout = setTimeout(function(){
+  function recived(){//When recived 
+      const myTimeout = setTimeout(function(){//wait 6 second for video to update
         var code = document.getElementById('video');
-      code.src = code.src;
-  
-      document.getElementById("video").style.display = "block"
+        code.src = code.src;
+        document.getElementById("video").style.display = "block"//Show video
+        var code = document.getElementById('video');
+        code.src = code.src;
+        document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 6000)
+  }
 
-      var code = document.getElementById('video');
-      code.src = code.src;
-      document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
-      window.scrollTo(0, document.body.scrollHeight);
-    }, 6000)
-    }
+  // function pingBackend(){
+  //   document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
+  //   var requestOptions = {
+  //     mode: 'no-cors',
+  //     method: 'GET',
+  //     redirect: 'follow'
+  //   };
+  //   fetch("https://simulator-server.herokuapp.com", requestOptions)
+  //     .then(response => response.text())
+  //     .then(result =>console.long(response))
+  //     .catch(error => console.log('error', error));
+  // }
 
-    function pingBackend(){
-      document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
-      var requestOptions = {
-        mode: 'no-cors',
-        method: 'GET',
-        redirect: 'follow'
-      };
-      fetch("https://simulator-server.herokuapp.com", requestOptions)
-        .then(response => response.text())
-        .then(result =>console.long(response))
-        .catch(error => console.log('error', error));
-    }
-
-    function simCode() {
+  function simCode() { //When Simulate Code is clicked send code to server to run simulation
       var formdata = new FormData();
-      document.getElementById("video").style.display = "none"
-      document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"
-      var rpsStirngNorps = "import robotarium as robotarium";
-      formdata.append("code", rpsStirngNorps + updateFile());
-      var requestOptions = {
+      document.getElementById("video").style.display = "none"//hide video
+      document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
+      var rpsStirngNorps = "import robotarium as robotarium";//the simulation code needs this line to not have rps
+      formdata.append("code", rpsStirngNorps + updateFile());//add to text file
+      var requestOptions = {//create post 
         mode: 'no-cors',
         method: 'POST',
         body: formdata,
         redirect: 'follow'
       };
       try{
-      fetch("https://simulator-server.herokuapp.com/simulationVideo", requestOptions)
+      fetch("https://simulator-server.herokuapp.com/simulationVideo", requestOptions)//post
         .then(result => recived())
         .catch((error) => {
           alert("There has been an error in the server, please try again later")
@@ -674,8 +665,7 @@ var pythonFile = null;
       }catch(err){
         alert("There has been an error in the server, please try again later")
       }
-        
-    }
+  }
   </script>
 
 </body>
