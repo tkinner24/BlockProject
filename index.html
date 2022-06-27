@@ -510,7 +510,7 @@ robotColorsList = []
 robot_labels = []
 t_end = time.time() + 60 * 5
 drawing = -1
-drawingType = "Ideal"
+drawingType = "Actual"
 
 def Fill_Start_Array():
     start_Array = np.array([[],[],[],[]])
@@ -581,7 +581,7 @@ while time.time() < t_end:
     
     if drawingType == "Ideal"
       for i in range(len(robotList)):
-        if robotList[i].get_Status() == False:
+        if robotList[i].get_Status() == True:
           print("nothing?")
         else:
           print("aaaaah")
