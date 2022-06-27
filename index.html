@@ -563,12 +563,15 @@ while time.time() < t_end:
     for i in range(len(robotList)):
       if robotList[i].get_Status() == False:
         if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] != -1  and ii == 0 :
-          print(robotList[i].get_Target_Points()[robotList[i].currentPoint][3])
           tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
-          print (tempColor)
           tempColor = "#" + tempColor[2:]
-          r.axes.plot(x[0],x[1],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6)
-          ii = 20
+          r.axes.plot(x[0][i],x[1][i],color=tempColor, marker='o', linestyle='dashed', linewidth=1, markersize=6)
+          drawFrame = True
+        
+    
+    if(drawFrame):
+      ii = 20
+      drawFrame = False
     if ii > 0:
       ii -= 1
     
