@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>Robotarium Block Coading Interface</title>
   <link rel="icon" href="robotariam_icon.png">
-  <!-- where all of the block files are found --> 
+  <!-- where all of the block files are found -->
   <script src="./node_modules/blockly/blockly_compressed.js"></script>
   <script src="./node_modules/blockly/blocks_compressed.js"></script>
   <script src="./node_modules/blockly/python_compressed.js"></script>
@@ -25,15 +25,17 @@
       background-color: #fff;
       font-family: sans-serif;
     }
+
     h1 {
       font-weight: normal;
       font-size: 140%;
     }
+
     textarea {
       width: 50%;
     }
   </style>
-  
+
 </head>
 
 <body onload="pingBackend()">
@@ -41,12 +43,16 @@
     <tr>
       <td>
         <p id="para">This is a block coding interface for the Georgia Tech Robotarium</p>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton" onclick="flipCode()">Show Python</button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton" onclick="simCode()">Simulate Python</button>
-            <a id="download" download="output.py" style="color:white">
-              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="updateFile()">Download Python</button>
-            </a>
-            <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1" style="width: 30px; height: 30px; margin:-10px; margin-left: 5px;">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton"
+          onclick="flipCode()">Show Python</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
+          onclick="simCode()">Simulate Python</button>
+        <a id="download" download="output.py" style="color:white">
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onclick="updateFile()">Download Python</button>
+        </a>
+        <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
+          style="width: 30px; height: 30px; margin:-10px; margin-left: 5px;">
         </p>
       </td>
       <td style="width: 35%"></td>
@@ -55,16 +61,17 @@
       </td>
     </tr>
   </table>
-  
+
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
-  <iFrame id="video" src="https://robotarium-simulator.herokuapp.com/static/uploads/video.mp4" style="width:100%; height:500px;display: none"></iFrame>
-  <pre class="prettyprint" id = "code"></pre>
- 
-  <!-- The individual blocks are imported to the menu --> 
+  <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
+    style="width:100%; height:500px;display: none"></iFrame>
+  <pre class="prettyprint" id="code"></pre>
+
+  <!-- The individual blocks are imported to the menu -->
   <!-- This xml file is all of the blocks that will be in the toolbox on the left-->
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
 
-      <!-- Logic imported --> 
+    <!-- Logic imported -->
     <category name="Logic" colour="%{BKY_LOGIC_HUE}">
       <block type="controls_if"></block>
       <block type="controls_ifelse"></block>
@@ -73,10 +80,10 @@
       <block type="logic_negate"></block>
       <block type="logic_boolean"></block>
       <block type="logic_null"></block>
-      <block type="logic_ternary"></block>      
+      <block type="logic_ternary"></block>
     </category>
 
-     <!-- loops imported --> 
+    <!-- loops imported -->
 
     <category name="Loops" colour="%{BKY_LOOPS_HUE}">
       <block type="controls_repeat_ext">
@@ -93,7 +100,7 @@
       <block type="controls_flow_statements"></block>
     </category>
 
-      <!-- math imported --> 
+    <!-- math imported -->
 
     <category name="Math" colour="%{BKY_MATH_HUE}">
       <block type="math_number">
@@ -197,10 +204,10 @@
       </block>
     </category>
 
-<!--    <category name="Variables" colour="%{BKY_TEXTS_HUE}">
+    <!--    <category name="Variables" colour="%{BKY_TEXTS_HUE}">
 
     </category> -->
-  <!-- Text Blocks Imported --> 
+    <!-- Text Blocks Imported -->
 
     <category name="Text" colour="%{BKY_TEXTS_HUE}">
       <block type="text"></block>
@@ -281,7 +288,7 @@
     </category>
 
 
-      <!-- List Blocks Imported --> 
+    <!-- List Blocks Imported -->
 
     <category name="Lists" colour="%{BKY_LISTS_HUE}">
       <block type="lists_create_with">
@@ -335,7 +342,7 @@
       <block type="lists_sort"></block>
     </category>
 
-      <!-- Color Blocks Imported --> 
+    <!-- Color Blocks Imported -->
 
     <category name="Color" colour="%{BKY_COLOUR_HUE}">
       <block type="colour_picker"></block>
@@ -375,11 +382,11 @@
         </value>
       </block>
     </category>
-      <!-- Variable Blocks Imported-->
+    <!-- Variable Blocks Imported-->
 
     <category name="Variables" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
 
-      <!-- Robotarium Blocks Imported --> 
+    <!-- Robotarium Blocks Imported -->
 
     <category name="Universal" colour="%{BKY_LOOPS_HUE}">
       <block type="display_image"></block>
@@ -411,7 +418,7 @@
           <field name="target_y">.8</field>
         </block>
       </next>
-    </block> 
+    </block>
   </xml>
 
   <script>
@@ -421,17 +428,17 @@
         toolbox: document.getElementById('toolbox')
       });
 
-    Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),demoWorkspace);
-    
-    function updateFile(){
+    Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'), demoWorkspace);
+
+    function updateFile() {
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      var rpsString = "import rps.robotarium as robotarium";
+      var rpsString = "import robotarium as robotarium";
       //This String goes before any block code and initializes everything
       var initialize = `
 
 # importing necesary robotarium libraries
-import rps.robotarium as robotarium
+import robotarium as robotarium
 from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
 from rps.utilities.misc import *
@@ -590,7 +597,7 @@ def New_Robot(name, x,y,t,color,drawing):
 def Add_Target_Point(name, x,y,t,drawing):
     robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing)
 `;
-//This String goes after all of the block code and it has all of the running parts
+      //This String goes after all of the block code and it has all of the running parts
       var end = `
 start_Array = Fill_Start_Array()
 #initializes the robotarium object
@@ -676,63 +683,116 @@ while time.time() < t_end:
 r.call_at_scripts_end()
 `;
 
-  var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
-  console.log(code)
-  var pythonFile = null;//creates python file
-        var data = new Blob([rpsString+code], { type: 'text/x-python' });
-        if (pythonFile !== null) {
-          window.URL.revokeObjectURL(pythonFile);
-        }
-        pythonFile = window.URL.createObjectURL(data);
-        document.getElementById("download").href = pythonFile;
-        return code;
-  }
-
-  showCode = true;
-  function flipCode() {//Shows code at bottom of screen
-    if(showCode){
-      var rpsString = "import rps.robotarium as robotarium";
-      updateFile();
-      document.getElementById("code").style.height = "auto";
-      document.getElementById("code").innerHTML = rpsString + updateFile();
-      showCode = !showCode;
-      document.getElementById('ShowPButton').innerHTML = "Hide Python";
-    }else{
-      showCode = !showCode;
-      document.getElementById('ShowPButton').innerHTML = "Show Python";
-      document.getElementById("code").style.height = "auto";
-      document.getElementById("code").innerHTML = "";
+      var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
+      console.log(code)
+      var pythonFile = null;//creates python file
+      var data = new Blob([rpsString + code], { type: 'text/x-python' });
+      if (pythonFile !== null) {
+        window.URL.revokeObjectURL(pythonFile);
+      }
+      pythonFile = window.URL.createObjectURL(data);
+      document.getElementById("download").href = pythonFile;
+      return code;
     }
-  }
-  
-  function recived(){//When recived 
-      const myTimeout = setTimeout(function(){//wait 6 second for video to update
-        var code = document.getElementById('video');
-        code.src = code.src;
-        document.getElementById("video").style.display = "block"//Show video
-        var code = document.getElementById('video');
-        code.src = code.src;
-        document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
-        window.scrollTo(0, document.body.scrollHeight);
-      }, 6000)
-  }
 
-  function pingBackend(){
-    document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
-    document.getElementById("RPButton").style.width = "0px"
-    document.getElementById("RPButton").style.display = "none"
-    // var requestOptions = {
-    //   mode: 'no-cors',
-    //   method: 'GET',
-    //   redirect: 'follow'
-    // };
-    // fetch("https://simulator-server.herokuapp.com", requestOptions)
-    //   .then(response => response.text())
-    //   .then(result =>console.long(response))
-    //   .catch(error => console.log('error', error));
-  }
+    showCode = true;
+    function flipCode() {//Shows code at bottom of screen
+      if (showCode) {
+        var rpsString = "import rps.robotarium as robotarium";
+        updateFile();
+        document.getElementById("code").style.height = "auto";
+        document.getElementById("code").innerHTML = rpsString + updateFile();
+        showCode = !showCode;
+        document.getElementById('ShowPButton').innerHTML = "Hide Python";
+      } else {
+        showCode = !showCode;
+        document.getElementById('ShowPButton').innerHTML = "Show Python";
+        document.getElementById("code").style.height = "auto";
+        document.getElementById("code").innerHTML = "";
+      }
+    }
 
-  function simCode() { //When Simulate Code is clicked send code to server to run simulation
+    function recived() {//When recived 
+      var myInterval = setInterval(function () {
+        getLogs();
+        if(completed){
+          const myTimeout = setTimeout((()=>{var code = document.getElementById('video');
+          code.src = code.src;
+          document.getElementById("video").style.display = "block"//Show video
+          var code = document.getElementById('video');
+          code.src = code.src;
+          document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
+          window.scrollTo(0, document.body.scrollHeight);
+          clearInterval(myInterval);}), 1000);
+          
+        }
+        else if(error){
+          alert("There is an error with the code! Good luck!");
+          clearInterval(myInterval);
+          document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
+        }
+      }, 5000);
+    }
+
+    function pingBackend() {
+      document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
+      document.getElementById("RPButton").style.width = "0px"
+      document.getElementById("RPButton").style.display = "none"
+      // var requestOptions = {
+      //   mode: 'no-cors',
+      //   method: 'GET',
+      //   redirect: 'follow'
+      // };
+      // fetch("https://simulator-server.herokuapp.com", requestOptions)
+      //   .then(response => response.text())
+      //   .then(result =>console.long(response))
+      //   .catch(error => console.log('error', error));
+    }
+    var error = false;
+    var completed = false;
+    async function getLogs() {
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Accept", "application/vnd.heroku+json; version=3");
+      myHeaders.append("Authorization", "Bearer 2f815750-6ed5-4e5b-8ea9-4c28b89353b4");
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+
+      var url = "";
+
+
+      await fetch("https://api.heroku.com/apps/sim-server-robo/log-sessions?lines=100", requestOptions)
+        .then(response => response.text())
+        .then(result => JSON.parse(result))
+        .then(obj => obj.logplex_url)
+        .then(function (objUrl) {
+          url = objUrl;
+        })
+        .catch(error => console.log('error', error));
+
+      var storedText = "";
+
+      await fetch(url)
+        .then(function (response) {
+          response.text().then(function (text) {
+            if(text.includes("Acceptance of your experiment is likely!")){
+              completed = true;
+            }
+            else if(text.includes("File")){
+              error = true;
+            }
+          });
+        });
+
+
+    }
+
+    async function simCode() { //When Simulate Code is clicked send code to server to run simulation
       var formdata = new FormData();
       document.getElementById("video").style.display = "none"//hide video
       document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
@@ -744,16 +804,16 @@ r.call_at_scripts_end()
         body: formdata,
         redirect: 'follow'
       };
-      try{
-      fetch("https://simulator-server.herokuapp.com/simulationVideo", requestOptions)//post
-        .then(result => recived())
-        .catch((error) => {
-          alert("There has been an error in the server, please try again later")
-        });
-      }catch(err){
+      try {
+        fetch("https://sim-server-robo.herokuapp.com/simulationVideo", requestOptions)//post
+          .then(result => recived())
+          .catch((error) => {
+            alert("There has been an error in the server, please try again later")
+          });
+      } catch (err) {
         alert("There has been an error in the server, please try again later")
       }
-  }
+    }
   </script>
 
 </body>
