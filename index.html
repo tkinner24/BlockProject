@@ -631,20 +631,20 @@ if drawingType == "Ideal":
 #loop that runs everything
 while time.time() < t_end:
   
-    #Ideal drawing. It creates a line for each drawing step and then drags one end with the robot leaving the other end at hte start of the step
-    if drawingType == "Ideal":
-        for i in range(len(robotList)):
-          if robotList[i].get_Status() == False:
-            if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] >= 0:
-              if lineStepCache[i] != robotList[i].currentPoint:
-                tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
-                tempColor = "#" + tempColor[2:]
-                while len(tempColor) != 7: 
-                  tempColor = tempColor[:2] + "0" + tempColor[2:]
-                robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6,zorder=10)
-                lineStepCache[i] = robotList[i].currentPoint
-              else:
-                robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
+    ##Ideal drawing. It creates a line for each drawing step and then drags one end with the robot leaving the other end at hte start of the step
+    # if drawingType == "Ideal":
+    #     for i in range(len(robotList)):
+    #       if robotList[i].get_Status() == False:
+    #         if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] >= 0:
+    #           if lineStepCache[i] != robotList[i].currentPoint:
+    #             tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
+    #             tempColor = "#" + tempColor[2:]
+    #             while len(tempColor) != 7: 
+    #               tempColor = tempColor[:2] + "0" + tempColor[2:]
+    #             robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6,zorder=10)
+    #             lineStepCache[i] = robotList[i].currentPoint
+    #           else:
+    #             robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
     
     #get robot positions
     x = r.get_poses()
