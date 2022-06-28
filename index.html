@@ -550,7 +550,7 @@ robotColorsList = []
 robot_labels = []
 #list of the ideal lines that the robots are currently drawing
 robotLines = []
-#sets a tome limit on the simulation
+#sets a time limit on the simulation
 t_end = time.time() + 60 * 5
 #sets initialy not drawing
 drawing = -1
@@ -613,13 +613,16 @@ ii = 0
 #used for actual to track drawing
 drawFrame = False
 
+#for ideal drawing, it sets up a place for the step of the previous line to be stored
 if drawingType == "Ideal":
     lineStepCache = []
     for nn in robotList:
         lineStepCache.append(0)
 
+#loop that runs everything
 while time.time() < t_end:
   
+    #Ideal drawing. It creates a line for each drawing step and then drags one end with the robot leaving the other end at hte start of the step
     if drawingType == "Ideal":
         for i in range(len(robotList)):
           if robotList[i].get_Status() == False:
@@ -634,14 +637,16 @@ while time.time() < t_end:
               else:
                 robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
     
-
+    #get robot positions
     x = r.get_poses()
+    #converts robot positions needed for some functions
     xi =  uni_to_si_states(x)
 
     dxu = unicycle_position_controller(x, Update_Target_Array(x))
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
     
+    #draws points at fixed intervals behind robots with their pen down
     if drawingType == "Actual":
       for i in range(len(robotList)):
         if robotList[i].get_Status() == False:
@@ -668,11 +673,11 @@ while time.time() < t_end:
       nameindex = namesList.index(robotname)
       robot_labels[nameindex].set_position([xi[0,nameindex],xi[1,nameindex]+0.15])
       
-    
+    #ends while loop when the program is finished
     r.step()
     if(Check_if_All_Done()):
         break
-
+#run at end of the program
 r.call_at_scripts_end()
 `;
 
