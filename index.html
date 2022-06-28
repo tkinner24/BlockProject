@@ -439,7 +439,6 @@
       var initialize = `
 
 # importing necesary robotarium libraries
-import robotarium as robotarium
 from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
 from rps.utilities.misc import *
@@ -729,7 +728,7 @@ r.call_at_scripts_end()
           code.src = code.src;
           document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
           window.scrollTo(0, document.body.scrollHeight);
-          clearInterval(myInterval);}), 1000);
+          clearInterval(myInterval);}), 3000);
           
         }
         else if(error){
@@ -786,7 +785,7 @@ r.call_at_scripts_end()
       await fetch(url)
         .then(function (response) {
           response.text().then(function (text) {
-            if(text.includes("Acceptance of your experiment is likely!")){
+            if(text.includes("Your simulation will take approximately")){
               completed = true;
             }
             else if(text.includes("File")){
