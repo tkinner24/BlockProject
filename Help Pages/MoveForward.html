@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>New Robot Block</title>
-    <link rel="icon" href="robotariam_icon.png">
+    <title>Robotarium Block Help</title>
+    <link rel="icon" href="Images/robotariam_icon.png">
     <style>
         body {
         font-family: "Lato", sans-serif;
@@ -89,14 +89,19 @@
   <a href="TurnTo.html">Turn To</a>
   <a href="PenDown.html">Pen Down</a>
   <a href="PenUp.html">Pen Up</a>
+  <h2>Examples</h2>
+    <a href="AboutTheRobotarium.html">About the Robotarium</a>
+    <a href="DrawingExamples.html">Drawing Examples</a>
+    <a href="MovementExamples.html">Movement Examples</a>
 </div>
 <div id="content">
-    <h2>Move to Point and Angle Block</h2>
+    <h2>Move Forward Block</h2>
     <p id="centerText">
-        This block makes the robot it is under drive to the specified x,y coordinates. 
-        It then turns the robot to the specified angle.
+        This block sets the destination of the robot the specified distance ahead of the robot. 
+        The robot will attempt to drive strait to the point the specified distanec ahead, but to avoid collisions it may have to deviate from a strait path.
+        It will keep its angle when it reaches its destination.
     </p>
-    <image src="MoveToPointAnglePic.png" class="center"></image>
+    <image src="Images/MoveForwardPic.png" class="center"></image>
 </div>
 <script>
 </script>

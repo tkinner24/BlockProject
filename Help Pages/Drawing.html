@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>New Robot Block</title>
-    <link rel="icon" href="robotariam_icon.png">
+    <title>Robotarium Block Help</title>
+    <link rel="icon" href="Images/robotariam_icon.png">
     <style>
         body {
         font-family: "Lato", sans-serif;
@@ -75,27 +75,32 @@
     </style>
 </head>
 <body style="height: 100%; overflow: hidden">
-
 <div id="mySidenav" class="sidenav">
-    <h2>Universal</h2>
-  <a href="DisplayImage.html">Display Image</a>
-  <a href="Drawing.html">Drawing Type</a>
-    <h2>Robot</h2>
-  <a href="NewRobotDoc.html">New Robot</a>
-  <a href="MoveToPoint.html">Move to Point</a>
-  <a href="MoveToPointAngle.html">Move to Point and Angle</a>
-  <a href="MoveForward.html">Move Forward</a>
-  <a href="Turn.html">Turn</a>
-  <a href="TurnTo.html">Turn To</a>
-  <a href="PenDown.html">Pen Down</a>
-  <a href="PenUp.html">Pen Up</a>
+     <h2>Universal</h2>
+    <a href="DisplayImage.html">Display Image</a>
+    <a href="Drawing.html">Drawing Type</a>
+      <h2>Robot</h2>
+    <a href="NewRobotDoc.html">New Robot</a>
+    <a href="MoveToPoint.html">Move to Point</a>
+    <a href="MoveToPointAngle.html">Move to Point and Angle</a>
+    <a href="MoveForward.html">Move Forward</a>
+    <a href="Turn.html">Turn</a>
+    <a href="TurnTo.html">Turn To</a>
+    <a href="PenDown.html">Pen Down</a>
+    <a href="PenUp.html">Pen Up</a>
+      <h2>Examples</h2>
+    <a href="AboutTheRobotarium.html">About the Robotarium</a>
+    <a href="DrawingExamples.html">Drawing Examples</a>
+    <a href="MovementExamples.html">Movement Examples</a>
 </div>
 <div id="content">
-    <h2>Pen Down Block</h2>
+    <h2>Drawing Block</h2>
     <p id="centerText">
-       This Block starts the drawing function on the robot it is attatched to. You can specify any color in the field, but the default is black.
+        This block specifies how you robots will draw their lines. It is a universal block, so whatever you chose in this block will be used by every robot for the whole program.
+        Ideal lines are the default mode. The robot will put one end of the line at the start of each step and the other end of the line at the end of the step.
+        The actual line drawing method puts a point at the robot's position at regular intervals.
     </p>
-    <image src="PenDownPic.png" class="center"></image>
+    <image src="Images/DrawingPic.png" class="center"></image>
 </div>
 <script>
 </script>
