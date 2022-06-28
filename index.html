@@ -394,6 +394,8 @@
       <block type="drawing_type"></block>
       <block type="new_polygon"></block>
       <block type="new_circle"></block>
+      <block type="new_rec"></block>
+      <block type="new_line"></block>
     </category>
 
     <category name="Robot" colour="%{BKY_MATH_HUE}">
@@ -436,7 +438,7 @@
     function updateFile() {
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      var rpsString = "import robotarium as robotarium";
+      var rpsString = "import rps.robotarium as robotarium";
       //This String goes before any block code and initializes everything
       var initialize = `
 
@@ -445,6 +447,7 @@ from rps.utilities.transformations import *
 from rps.utilities.barrier_certificates import *
 from rps.utilities.misc import *
 from rps.utilities.controllers import *
+import matplotlib.lines as lines
 
 # importing other necessary libraries
 import numpy as np
@@ -559,6 +562,10 @@ robotColorsList = []
 robot_labels = []
 #list of the ideal lines that the robots are currently drawing
 robotLines = []
+#list of the shapes to be drawn
+shapesList = []
+#list of lines to be draw
+lineList = []
 #sets a time limit on the simulation
 t_end = time.time() + 60 * 5
 #sets initialy not drawing
@@ -628,6 +635,10 @@ if drawingType == "Ideal":
     for nn in robotList:
         lineStepCache.append(0)
 
+for s in shapesList:
+  r.axes.add_patch(s)
+for l in lineList:
+  r.axes.add_line(l)
 #loop that runs everything
 while time.time() < t_end:
   
