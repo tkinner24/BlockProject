@@ -89,14 +89,29 @@
   <a href="TurnTo.html">Turn To</a>
   <a href="PenDown.html">Pen Down</a>
   <a href="PenUp.html">Pen Up</a>
+    <h2>Examples</h2>
+  <a href="AboutTheRobotarium.html">About the Robotarium</a>
+  <a href="DrawingExamples.html">Drawing Examples</a>
+  <a href="MovementExamples.html">Movement Examples</a>
 </div>
 <div id="content">
-    <h2>About The Robotarium</h2>
+    <h2>Drawing examples</h2>
     <p id="centerText">
-       text explaining the purpose
+       For drawing it is best to thing of the robot like it as a pen attatched to it that it can lift off of the screen or put down onto it.
+        There are two ways that the robot can draw its path. <br>
+        The default is the ideal path. 
+        It draws a dot at the start of each step, and drags a line between the dot and itself across the ground untill it reaches its destination where it drops its end of the line.
+        It therefore draws the ideal pathe the robot could have taken between the points.
     </p>
-    <!-- insert robotarium logo -->
-    <image src="robotariam_icon.png" class="center"></image>
+    <!-- insert an image if ideal path -->
+    <image src="PenDownPic.png" class="center"></image>
+    <p id="centerText">
+        The actual path of the robot is not always strait. 
+        Not only is the robot not necessarily pointed strait at its target when it starts its step, but also there are other robots it has to avoid.
+        The actual drawing simply draws dots at the robot position at regular intervals.
+    </p>
+    <!--insert image of actual path-->
+    <image src="" class="center"></image>
 </div>
 <script>
 </script>
