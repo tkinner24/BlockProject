@@ -494,10 +494,10 @@ class Robot:
     
     #checks if a robot is within the allowed degrees of a specified angle
     def angle_In_Range(self, angle, accuracy = .07):
-      if((self.target_points[self.currentPoint][2]-accuracy<angle<self.target_points[self.currentPoint][2]+accuracy)):
+      if((self.target_points[self.currentPoint][2]-accuracy < angle < self.target_points[self.currentPoint][2]+accuracy)):
               return True     
       elif(self.target_points[self.currentPoint][2] == 3.14):
-          if(3.14-accuracy<math.fabs(angle)<3.14+accuracy):
+          if(3.14-accuracy < math.fabs(angle) < 3.14+accuracy):
               return True
       else:
           return False
@@ -505,7 +505,7 @@ class Robot:
     #checks if a robot is within the allowed distance of a point
     def check_Position(self,robot_num, pos, accuracy = .03):
         if(not self.finished):
-            if((self.target_points[self.currentPoint][0]-accuracy< pos[0][robot_num] < self.target_points[self.currentPoint][0]+accuracy) and (self.target_points[self.currentPoint][1]-accuracy< pos[1][robot_num] < self.target_points[self.currentPoint][1]+accuracy) and (self.angle_In_Range(pos[2][robot_num]))):
+            if((self.target_points[self.currentPoint][0]-accuracy < pos[0][robot_num] < self.target_points[self.currentPoint][0]+accuracy) and (self.target_points[self.currentPoint][1]-accuracy < pos[1][robot_num] < self.target_points[self.currentPoint][1]+accuracy) and (self.angle_In_Range(pos[2][robot_num]))):
                 self.step_Current_Point()
                 return True
             else:
@@ -676,6 +676,7 @@ r.call_at_scripts_end()
 `;
 
   var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
+  console.log(code)
   var pythonFile = null;//creates python file
         var data = new Blob([rpsString+code], { type: 'text/x-python' });
         if (pythonFile !== null) {
