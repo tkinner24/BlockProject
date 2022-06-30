@@ -43,6 +43,10 @@
     <tr>
       <td style="width: 80%;">
         <p id="para">This is a block coding interface for the Georgia Tech Robotarium</p>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
+          onclick="saveCode()">Save</button>
+       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
+          onclick="clearSave()">Clear Save</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton"
           onclick="flipCode()">Show Python</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
@@ -750,6 +754,32 @@ r.call_at_scripts_end()
       }
     }
 
+    function saveCode(){
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+      window.localStorage.setItem("BlocklyCode", xmlText);
+    }
+
+    function clearSave(){
+      window.localStorage.clear();
+    }
+
+    window.onload = (event) => {
+      xml = window.localStorage.getItem("BlocklyCode");
+      if (typeof xml != "string" || xml.length < 5) {
+        return false;
+    }
+
+    try {
+        var dom = Blockly.Xml.textToDom(xml);
+        Blockly.mainWorkspace.clear();
+        Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);
+        return true;
+    } catch (e) {
+        return false;
+    }
+    };
+
     function recived() {//When recived 
       var myInterval = setInterval(function () {
         getLogs();
@@ -829,6 +859,9 @@ r.call_at_scripts_end()
         });
 
 
+    }
+    window.onbeforeunload = function(){
+      event.preventDefault();
     }
 
     async function simCode() { //When Simulate Code is clicked send code to server to run simulation
