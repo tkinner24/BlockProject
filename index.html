@@ -480,7 +480,7 @@ class Robot:
         self.name = name
         self.start_array = np.array([[x],[y],[theta],[drawing],[message]])
         self.target_points.append((x,y,theta,drawing))
-        self.output_points = np.array([[x],[y],[theta],[drawing],message])
+        self.output_points = np.array([[x],[y],[theta],[drawing],[message]])
     
     #this block adds a target point to the target_points array for a specific robot
     def add_Target_Point(self,x,y,t,drawing,message):
@@ -681,12 +681,12 @@ while time.time() < t_end:
 
     #message goes here
     for i in range(len(robotList)):
-      robotMessageState = robotList[i].get_Target_points()[robotList[i].currentPoint][4]
+      robotMessageState = robotList[i].get_Target_Points()[robotList[i].currentPoint][4]
       if robotMessageState > 0:
         messageList[robotMessageState][4] = True
       elif robotMessageState < 0:
         if messsageList[robotMessageState * -1][4] == False:
-          print (wait)
+          dxu[i] = [[0],[0]]
 
 
     dxu = uni_barrier_cert(dxu, x)
