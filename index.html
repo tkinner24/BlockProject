@@ -12,6 +12,7 @@
   <script src="./node_modules/blockly/msg/en.js"></script>
   <script src="./node_modules/blockly/blocks/lists.js"></script>
   <script src="./node_modules/blockly/blocks/colour.js"></script>
+  <script type="text/javascript" src="https://raw.githubusercontent.com/Stuk/jszip/main/dist/jszip.js"></script>
 
   <!--This where the python that creates the output of the custom blocks-->
   <script src="./node_modules/blockly/generators/python/robotarium.js"></script>
@@ -47,10 +48,11 @@
           onclick="flipCode()">Show Python</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
           onclick="simCode()">Simulate Python</button>
-        <a id="download" download="output.py" style="color:white">
+        <a id="download" download="output.py,Sprites/RockSprites.png" style="color:white">
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onclick="updateFile()">Download Python</button>
         </a>
+        <button id="downloadImages">Download Images</button>
         <a href="Help Pages/AboutTheRobotarium.html"><button>Help</button></a>
         <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
             style="width: 30px; height: 30px; margin-left: 5px;">
@@ -429,6 +431,7 @@
   </xml>
 
   <script>
+
     var demoWorkspace = Blockly.inject('blocklyDiv',
       {
         media: 'https://unpkg.com/blockly/media/',
@@ -440,7 +443,7 @@
     function updateFile() {
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      var rpsString = "import rps.robotarium as robotarium";
+      var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"./rps/examples/Custom_Test/Sprites/\"";
       //This String goes before any block code and initializes everything
       var initialize = `
 
@@ -558,6 +561,8 @@ class Robot:
 robotList = []
 #list of the robot's names
 namesList = []
+#list of images
+imageList = []
 #list of the robot's colors
 robotColorsList = []
 #list of the label objecs that stay above the robots displaying their names
@@ -641,6 +646,8 @@ for s in shapesList:
   r.axes.add_patch(s)
 for l in lineList:
   r.axes.add_line(l)
+for i in imageList:
+  r.axes.imshow(i[0], extent=i[1])
 #loop that runs everything
 while time.time() < t_end:
   
@@ -704,7 +711,7 @@ r.call_at_scripts_end()
 `;
 
       var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
-      console.log(code)
+      
       var pythonFile = null;//creates python file
       var data = new Blob([rpsString + code], { type: 'text/x-python' });
       if (pythonFile !== null) {
@@ -716,9 +723,46 @@ r.call_at_scripts_end()
     }
 
     showCode = true;
+
+    function findImages(code){
+      var JSZip = require("jszip");
+      flag = false;
+      imageList = []
+      charArray = []
+      for(let i = 0; i<code.length; i++){
+        if(flag){
+          charArray.push(code.charAt(i));
+        }
+        if(code.charAt(i) == '@'){
+          flag = true;
+        }else if(code.charAt(i) == '&'){
+          flag = false;
+          imageList.push(charArray.join('').slice(0, charArray.join('').length - 1));
+          charArray = [];
+        }
+      }
+      newImageList = [];
+      for(let i = 0;i<imageList.length;i++){
+        if(newImageList.includes(imageList[i])){
+
+        }else{
+          newImageList.push(imageList[i]);
+        }
+      }
+      console.log(newImageList)
+      
+      var zip = new JsZip();
+      for(let i=0;i<newImageList.length;i++){
+        zip.add(newImageList[i]+".png", "Sprites/"+newImageList[i]+".png");
+      }
+      content = zip.generate();
+      document.getElementById("downloadImages").location.href="data:application/zip;base64," + content;
+    }
+
+
     function flipCode() {//Shows code at bottom of screen
       if (showCode) {
-        var rpsString = "import rps.robotarium as robotarium";
+        var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"\"";
         updateFile();
         document.getElementById("code").style.height = "auto";
         document.getElementById("code").innerHTML = rpsString + updateFile();
@@ -818,7 +862,7 @@ r.call_at_scripts_end()
       document.getElementById("video").style.display = "none"//hide video
       document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
       document.getElementById("loadingText").innerHTML = "Simulation Loading...";//empty text box
-      var rpsStirngNorps = "import robotarium as robotarium";//the simulation code needs this line to not have rps
+      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \""+server_root+"\"";//the simulation code needs this line to not have rps
       formdata.append("code", rpsStirngNorps + updateFile());//add to text file
       var requestOptions = {//create post 
         mode: 'no-cors',

@@ -18,6 +18,9 @@
     ]
   },
   "dependencies": {
-    "blockly": "^5.20210325.0"
+    "blockly": "^5.20210325.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.0",
+    "multi-download": "^4.0.0"
   }
 }
