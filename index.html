@@ -686,11 +686,10 @@ while time.time() < t_end:
     for i in range(len(robotList)):
       robotMessageState = robotList[i].get_Target_Points()[robotList[i].currentPoint][4]
       if robotMessageState > 0:
-        messageList[robotMessageState][4] = True
+        messageList[robotMessageState][1] = True
       elif robotMessageState < 0:
-        if messsageList[robotMessageState * -1][4] == False:
-          dxu[i] = [[0],[0]]
-
+        if messageList[robotMessageState * -1][1] == False:
+          dxu[i] = [0,0]
 
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
