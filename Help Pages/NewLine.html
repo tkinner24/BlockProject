@@ -13,7 +13,7 @@
         height: 90%;
         width: 250px;
         position: fixed;
-        top: 0;
+        top: -50px;
         left: 0;
         right: 10;
         background-color: #111;
@@ -33,6 +33,17 @@
         }
 
         .sidenav h2 {
+        padding: 1px 1px 1px 32px;
+        margin: 10px;
+        margin-left: -5px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #a0a0a0;
+        display: block;
+        transition: 0.3s;
+        }
+
+        .sidenav .back{
         padding: 1px 1px 1px 32px;
         margin: 10px;
         margin-left: -5px;
@@ -79,6 +90,7 @@
 <body style="height: 100%; overflow: hidden">
 
 <div id="mySidenav" class="sidenav">
+    <h2 class="back" ><a class="back" href="../index.html">Back</a></h2>
     <h2>Universal</h2>
   <a href="DisplayImage.html">Display Image</a>
   <a href="Drawing.html">Drawing Type</a>
@@ -99,7 +111,9 @@
   <a href="AboutTheRobotarium.html">About the Robotarium</a>
   <a href="DrawingExamples.html">Drawing Examples</a>
   <a href="MovementExamples.html">Movement Examples</a>
+  
   <div style="height: 40px;"></div>
+  
 </div>
 <div id="content">
     <h2>New Line</h2>
@@ -107,7 +121,6 @@
         To due
     </p>
     <image src="Images/NewLine.png" class="center"></image>
-    <a href="../index.html"><button style="bottom: 10px; position:absolute;">Back</button></a>
 </div>
 <script>
 </script>
