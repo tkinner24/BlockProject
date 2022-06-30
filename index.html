@@ -12,7 +12,7 @@
   <script src="./node_modules/blockly/msg/en.js"></script>
   <script src="./node_modules/blockly/blocks/lists.js"></script>
   <script src="./node_modules/blockly/blocks/colour.js"></script>
-  <script type="text/javascript" src="https://raw.githubusercontent.com/Stuk/jszip/main/dist/jszip.js"></script>
+  <script src=".\FileSaver.js-master\dist\FileSaver.js"></script>
 
   <!--This where the python that creates the output of the custom blocks-->
   <script src="./node_modules/blockly/generators/python/robotarium.js"></script>
@@ -52,11 +52,8 @@
           onclick="flipCode()">Show Python</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
           onclick="simCode()">Simulate Python</button>
-        <a id="download" download="output.py,Sprites/RockSprites.png" style="color:white">
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onclick="updateFile()">Download Python</button>
-        </a>
-        <button id="downloadImages">Download Images</button>
+            onclick="download()">Download</button>
         <a href="Help Pages/AboutTheRobotarium.html"><button>Help</button></a>
         <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
             style="width: 30px; height: 30px; margin-left: 5px;">
@@ -734,20 +731,36 @@ r.call_at_scripts_end()
 
       var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
       
-      var pythonFile = null;//creates python file
-      var data = new Blob([rpsString + code], { type: 'text/x-python' });
-      if (pythonFile !== null) {
-        window.URL.revokeObjectURL(pythonFile);
-      }
-      pythonFile = window.URL.createObjectURL(data);
-      document.getElementById("download").href = pythonFile;
+      // var pythonFile = null;//creates python file
+      // var data = new Blob([rpsString + code], { type: 'text/x-python' });
+      // if (pythonFile !== null) {
+      //   window.URL.revokeObjectURL(pythonFile);
+      // }
+      // pythonFile = window.URL.createObjectURL(data);
+      // document.getElementById("download").href = pythonFile;
       return code;
     }
 
     showCode = true;
 
+    function loadXHR(url) {
+      return new Promise(function(resolve, reject) {
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET", url);
+          xhr.responseType = "blob";
+          xhr.onerror = function() {reject("Network error.")};
+          xhr.onload = function() {
+            if (xhr.status === 200) {resolve(xhr.response)}
+            else {reject("Loading error:" + xhr.statusText)}
+          };
+          xhr.send();
+        }
+        catch(err) {reject(err.message)}
+      });
+    }
+
     function findImages(code){
-      var JSZip = require("jszip");
       flag = false;
       imageList = []
       charArray = []
@@ -771,14 +784,26 @@ r.call_at_scripts_end()
           newImageList.push(imageList[i]);
         }
       }
-      console.log(newImageList)
-      
-      var zip = new JsZip();
-      for(let i=0;i<newImageList.length;i++){
-        zip.add(newImageList[i]+".png", "Sprites/"+newImageList[i]+".png");
+      return(newImageList);
+    }
+
+    function download(){
+      var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"./rps/examples/Custom_Test/Sprites/\"";
+      var data = new Blob([rpsString + updateFile()], { type: 'text/x-python' });
+      saveAs(data,"output.py")
+      list = findImages(updateFile());
+      l = 0;
+      p = list.length
+      for(i =0;i<list.length;i++){
+        loadXHR('https://raw.githubusercontent.com/avayedawadi/BlockProject/main/Sprites/'+list[i]+'.png').then(function(blob) {
+          if(p <= 1){
+            saveAs(blob, String(list)+".png");
+          }else{
+            saveAs(blob, String(list[l])+".png");
+          }
+          l++;
+        });
       }
-      content = zip.generate();
-      document.getElementById("downloadImages").location.href="data:application/zip;base64," + content;
     }
 
 
@@ -904,6 +929,7 @@ r.call_at_scripts_end()
 
 
     }
+
     window.onbeforeunload = function(){
       event.preventDefault();
     }

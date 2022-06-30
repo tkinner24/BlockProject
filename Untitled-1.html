@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+	<script src=".\FileSaver.js-master\dist\FileSaver.js"></script>
+</HEAD>
+
+<BODY>
+
+	<input type="button" onclick="onClick()" value="Create Zip"></input>
+	<a href="C:\Users\cshaffer36\Desktop\generator-demo\Sprites\RockSprite.png" download="output.png">Download</a>
+
+</BODY>
+
+<script>
+	
+function loadXHR(url) {
+
+return new Promise(function(resolve, reject) {
+	try {
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url);
+		xhr.responseType = "blob";
+		xhr.onerror = function() {reject("Network error.")};
+		xhr.onload = function() {
+			if (xhr.status === 200) {resolve(xhr.response)}
+			else {reject("Loading error:" + xhr.statusText)}
+		};
+		xhr.send();
+	}
+	catch(err) {reject(err.message)}
+});
+
+
+}
+
+function onClick(){
+
+	loadXHR('Sprites/RockSprite.png').then(function(blob) {
+		saveAs(blob, "Rock.png");
+	});
+}
+    
+</script>
+</HTML>
