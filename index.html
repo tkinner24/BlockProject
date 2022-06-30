@@ -44,6 +44,10 @@
     <tr>
       <td style="width: 80%;">
         <p id="para">This is a block coding interface for the Georgia Tech Robotarium</p>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
+          onclick="saveCode()">Save</button>
+       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
+          onclick="clearSave()">Clear Save</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton"
           onclick="flipCode()">Show Python</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
@@ -411,6 +415,8 @@
       <block type="turn_to"></block>
       <block type="pen_down"></block>
       <block type="pen_up"></block>
+      <block type="send_message"></block>
+      <block type="wait_until_message"></block>
       <!-- block type="wait"></block -->
     </category>
 
@@ -467,6 +473,7 @@ class Robot:
         self.target_points = []
         self.currentPoint = 0
         self.totalPoints = 0
+        message = 0
         self.finished = False
         self.output_points = np.array([[],[],[]])
         t=t%360
@@ -474,17 +481,17 @@ class Robot:
             t=t-360
         theta = t * 3.14/180
         self.name = name
-        self.start_array = np.array([[x],[y],[theta],[drawing]])
+        self.start_array = np.array([[x],[y],[theta],[drawing],[message]])
         self.target_points.append((x,y,theta,drawing))
-        self.output_points = np.array([[x],[y],[theta],[drawing]])
+        self.output_points = np.array([[x],[y],[theta],[drawing],message])
     
     #this block adds a target point to the target_points array for a specific robot
-    def add_Target_Point(self,x,y,t,drawing):
+    def add_Target_Point(self,x,y,t,drawing,message):
         self.totalPoints = self.totalPoints + 1
         t=t%360
         if(t>180):
             t=t-360
-        self.target_points.append((x,y,t*3.14/180,drawing))
+        self.target_points.append((x,y,t*3.14/180,drawing,message))
 
     #returns the 2D target points aray for a specific robot
     def get_Target_Points(self):
@@ -496,6 +503,7 @@ class Robot:
         self.output_points[1] = self.target_points[self.currentPoint][1]
         self.output_points[2] = self.target_points[self.currentPoint][2]
         self.output_points[3] = self.target_points[self.currentPoint][3]
+        self.output_points[4] = self.target_points[self.currentPoint][4]
     
     #This function moves the robot to the next step and if it is finished, it sets self.finished to true
     def step_Current_Point(self):
@@ -534,27 +542,27 @@ class Robot:
 
     #Sets a point the specified distance ahead of the robot at the same ange as the starting angle.
     #it then adds that point to the target array
-    def move_Forward(self, distance, drawing):
+    def move_Forward(self, distance, drawing, message):
         curX = self.target_points[self.totalPoints][0]
         curY = self.target_points[self.totalPoints][1]
         curT = self.target_points[self.totalPoints][2]
         addX = distance * math.cos(curT)
         addY = distance * math.sin(curT)
-        self.add_Target_Point((curX+addX),(curY+addY),(curT*180/3.14),drawing)
+        self.add_Target_Point((curX+addX),(curY+addY),(curT*180/3.14),drawing, message)
     
     #adds a target point at the robot's current position, but turned by the specified angle
-    def turn(self,by,drawing):
+    def turn(self,by,drawing, message):
           curX = self.target_points[self.totalPoints][0]
           curY = self.target_points[self.totalPoints][1]
           curT = self.target_points[self.totalPoints][2]*180/3.14
           curT = (curT + by)%360
-          self.add_Target_Point((curX),(curY),(curT),drawing)
+          self.add_Target_Point((curX),(curY),(curT),drawing, message)
 
     #turns the robot to a specified angle on the spot
-    def turn_To(self,to,drawing):
+    def turn_To(self,to,drawing, message):
         curX = self.target_points[self.totalPoints][0]
         curY = self.target_points[self.totalPoints][1]
-        self.add_Target_Point((curX),(curY),(to),drawing)
+        self.add_Target_Point((curX),(curY),(to),drawing, message)
 
 #necessary lists
 #list of robot objects
@@ -579,17 +587,18 @@ t_end = time.time() + 60 * 5
 drawing = -1
 #sets default drawing type to ideal
 drawingType = "Ideal"
+messageList = [["string here boolean there -> "],[False]]
 
 #fills the start array with all of the initial robot positions
 def Fill_Start_Array():
-    start_Array = np.array([[],[],[],[]])
+    start_Array = np.array([[],[],[],[],[]])
     for robot in robotList:
         start_Array = np.append(start_Array,robot.get_Output_Points(), axis = 1)
     return start_Array
 
 #Consolidares all of the robot's output arrays into a single array
 def Update_Target_Array(pos):
-    target_Array = np.array([[],[],[],[]])
+    target_Array = np.array([[],[],[],[],[]])
     for i in range(len(robotList)):
         robotList[i].check_Position(i,pos)
         target_Array = np.append(target_Array,robotList[i].get_Output_Points(), axis = 1)
@@ -603,15 +612,15 @@ def Check_if_All_Done():
     return True
 
 #initializes a new robot
-def New_Robot(name, x,y,t,color,drawing):
+def New_Robot(name, x,y,t,color):
     namesList.append(name)
     robotList.append(Robot(name,x,y,t,drawing))
     robotColorsList.append(color)
     robotLines.append([])
 
 #adds passed in point to target array
-def Add_Target_Point(name, x,y,t,drawing):
-    robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing)
+def Add_Target_Point(name, x,y,t,drawing, message):
+    robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing, message)
 `;
       //This String goes after all of the block code and it has all of the running parts
       var end = `
@@ -672,9 +681,22 @@ while time.time() < t_end:
     xi =  uni_to_si_states(x)
 
     dxu = unicycle_position_controller(x, Update_Target_Array(x))
+
+    #message goes here
+    for i in range(len(robotList)):
+      robotMessageState = robotList[i].get_Target_points()[robotList[i].currentPoint][4]
+      if robotMessageState > 0:
+        messageList[robotMessageState][4] = True
+      elif robotMessageState < 0:
+        if messsageList[robotMessageState * -1][4] == False:
+          print (wait)
+
+
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
     
+    
+
     #draws points at fixed intervals behind robots with their pen down
     if drawingType == "Actual":
       for i in range(len(robotList)):
@@ -776,6 +798,32 @@ r.call_at_scripts_end()
       }
     }
 
+    function saveCode(){
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+      window.localStorage.setItem("BlocklyCode", xmlText);
+    }
+
+    function clearSave(){
+      window.localStorage.clear();
+    }
+
+    window.onload = (event) => {
+      xml = window.localStorage.getItem("BlocklyCode");
+      if (typeof xml != "string" || xml.length < 5) {
+        return false;
+    }
+
+    try {
+        var dom = Blockly.Xml.textToDom(xml);
+        Blockly.mainWorkspace.clear();
+        Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);
+        return true;
+    } catch (e) {
+        return false;
+    }
+    };
+
     function recived() {//When recived 
       var myInterval = setInterval(function () {
         getLogs();
@@ -855,6 +903,9 @@ r.call_at_scripts_end()
         });
 
 
+    }
+    window.onbeforeunload = function(){
+      event.preventDefault();
     }
 
     async function simCode() { //When Simulate Code is clicked send code to server to run simulation
