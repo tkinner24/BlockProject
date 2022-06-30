@@ -416,14 +416,18 @@
 
   <!-- This xml file is the starting blocks that defalt in the begining-->
   <xml xmlns="https://developers.google.com/blockly/xml" id="startBlocks" style="display: none">
-    <block type="new_robot">
-      <field name="name">Bob</field>
-      <next>
+    <block type="initializeRobotarium">
+      <field name="robotInitializeCode">
+        <block type="new_robot">
+          <field name="name">Bob</field>
+      </field>
+      <field name="whileLoopCode">
         <block type="run_to_point">
           <field name="target_x">.8</field>
           <field name="target_y">.8</field>
         </block>
-      </next>
+      </field>
+      </block>
     </block>
   </xml>
 
@@ -439,7 +443,7 @@
     function updateFile() {
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       var fr = new FileReader();
-      // var rpsString = "import robotarium as robotarium";
+      var rpsString = "import robotarium as robotarium";
       //This String goes before any block code and initializes everything
       // var initialize = `
 
