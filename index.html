@@ -711,11 +711,10 @@ while time.time() < t_end:
           tempList = list(robotList[i].target_points[robotList[i].currentPoint])
           tempList[3] = -2
           robotList[i].target_points[robotList[i].currentPoint] = tuple(tempList)
-          print (robotList[i].target_points[robotList[i].currentPoint])
+          #print (robotList[i].target_points[robotList[i].currentPoint])
           
         if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] == -2:
-          #fix this
-          print(robotList[i].waiting)
+          #print(robotList[i].waiting)
           robotList[i].waiting -= 33
           if robotList[i].waiting <= 0:
             tempList = list(robotList[i].target_points[robotList[i].currentPoint])
