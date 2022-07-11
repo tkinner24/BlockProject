@@ -683,12 +683,21 @@ while time.time() < t_end:
 
     #message goes here
     for i in range(len(robotList)):
-      robotMessageState = robotList[i].get_Target_Points()[robotList[i].currentPoint][4]
+      try:
+        robotMessageState = robotList[i].get_Target_Points()[robotList[i].currentPoint][4]
+      # except:
+      #   print(namesList[i])
+      #   print(i)
+      #   print(robotList[i].currentPoint)
+      #   print(robotList[i].get_Target_Points())
+      except:
+        foo = 0
+        #this robot is finished
       if robotMessageState > 0:
         messageList[robotMessageState][1] = True
       elif robotMessageState < 0:
         if messageList[robotMessageState * -1][1] == False:
-          dxu[i] = [0,0]
+          dxu[0:2,i] = 0
 
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
