@@ -57,21 +57,21 @@
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="ShowPButton" href="#" onClick="flipCode()">Show Python</a>
+              <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="flipCode()">Show Python</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="ShowPButton" href="#" onClick="simCode()">Simulate</a>
+              <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="simCode()">Simulate</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="ShowPButton" href="#" onClick="download()">Download</a>
+              <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="Download()">Download</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 More
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#" onClick="saveCode()">Save</a></li>
-                <li><a class="dropdown-item" href="#" onClick="clearSave()">Clear Save</a></li>
+                <li><a class="dropdown-item" href="" onClick="saveCode()">Save</a></li>
+                <li><a class="dropdown-item" href="" onClick="clearSave()">Clear Save</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
@@ -84,31 +84,14 @@
     </nav>
     <tr>
       <td style="width: 80%;">
-        <p id="para">This is a block coding interface for the Georgia Tech Robotarium</p>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
-          onclick="saveCode()">Save</button>
-       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
-          onclick="clearSave()">Clear Save</button>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton"
-          onclick="flipCode()">Show Python</button>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" style = "display: none;" id="refresh"
+        <button class="btn btn-primary" style = "display: none;" id="refresh"
           onclick="refreshCode()">Refresh Python</button>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
-          onclick="simCode()" style="margin-left:0px;">Simulate Python</button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onclick="download()">Download</button>
-        <a href="Help Pages/AboutTheRobotarium.html"><button>Help</button></a>
-        <img id="loading" src="https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"
-            style="width: 30px; height: 30px; margin-left: 5px;">
         <sub id="loadingText" style="font-size: 8px; width: fit-content; margin-bottom: 10px;"></sub>
         </td>
         </p>
       </td>
       <td style="width: 35%">
-        <img src="graph.png" style="height: 120px;">
-      </td>
-      <td>
-        <img src="Help Pages/Images/robotarium_header.png" sizes="" style="height: 90px; right: 10px;">
+        <img onclick="enlargeImg()" id="img1" src="graph.png" style="height: 120px;">
       </td>
     </tr>
   </table>
@@ -116,7 +99,7 @@
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
   <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
     style="width:100%; height:500px;display: none"></iFrame>
-  <pre class="prettyprint" id="code"></pre>
+  <pre style="width:50%;" class="prettyprint" id="code"></pre>
 
   <!-- The individual blocks are imported to the menu -->
   <!-- This xml file is all of the blocks that will be in the toolbox on the left-->
@@ -480,6 +463,7 @@
   </xml>
 
   <script>
+    rpsString = "";
 
     var demoWorkspace = Blockly.inject('blocklyDiv',
       {
@@ -859,7 +843,8 @@ r.call_at_scripts_end()
       return(newImageList);
     }
 
-    function download(){
+    function Download(){
+      console.log("download");
       var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"\"";
       var data = new Blob([rpsString + updateFile()], { type: 'text/x-python' });
       saveAs(data,"output.py")
