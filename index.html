@@ -50,8 +50,10 @@
           onclick="clearSave()">Clear Save</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="ShowPButton"
           onclick="flipCode()">Show Python</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" style = "display: none;" id="refresh"
+          onclick="refreshCode()">Refresh Python</button>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="SimPButton"
-          onclick="simCode()">Simulate Python</button>
+          onclick="simCode()" style="margin-left:0px;">Simulate Python</button>
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onclick="download()">Download</button>
         <a href="Help Pages/AboutTheRobotarium.html"><button>Help</button></a>
@@ -815,12 +817,18 @@ r.call_at_scripts_end()
         document.getElementById("code").innerHTML = rpsString + updateFile();
         showCode = !showCode;
         document.getElementById('ShowPButton').innerHTML = "Hide Python";
+        document.getElementById('refresh').style.display = 'inline'
       } else {
         showCode = !showCode;
         document.getElementById('ShowPButton').innerHTML = "Show Python";
+        document.getElementById('refresh').style.display = 'none';
         document.getElementById("code").style.height = "auto";
         document.getElementById("code").innerHTML = "";
       }
+    }
+
+    function refreshCode(){
+      document.getElementById("code").innerHTML = rpsString + updateFile();
     }
 
     function saveCode(){
