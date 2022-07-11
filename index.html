@@ -669,10 +669,9 @@ while time.time() < t_end:
                 tempColor = "#" + tempColor[2:]
                 while len(tempColor) != 7: 
                   tempColor = tempColor[:2] + "0" + tempColor[2:]
-                robotLines[i] = r.axes.plot([x[0][i],x[1][i]],[x[0][i],x[1][i]],color=tempColor, marker='o', linewidth=1, markersize=6,zorder=10)
+                robotLines[i] = r.axes.plot([0,0],[0,0],color=tempColor, marker='o', linewidth=1, markersize=6,zorder=10)
                 lineStepCache[i] = robotList[i].currentPoint
-              else:
-                robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
+              robotLines[i][0].set_data([x[0][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[x[1][i],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
     
     #get robot positions
     x = r.get_poses()
@@ -798,7 +797,7 @@ r.call_at_scripts_end()
     }
 
     function download(){
-      var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"./rps/examples/Custom_Test/Sprites/\"";
+      var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"\"";
       var data = new Blob([rpsString + updateFile()], { type: 'text/x-python' });
       saveAs(data,"output.py")
       list = findImages(updateFile());

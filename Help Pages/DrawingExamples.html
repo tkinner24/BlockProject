@@ -2,11 +2,12 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>New Robot Block</title>
-    <link rel="icon" href="robotariam_icon.png">
+    <title>Drawing Examples</title>
+    <link rel="icon" href="Images/robotariam_icon.png">
     <style>
         body {
         font-family: "Lato", sans-serif;
+        height: 100%;
         }
 
         .sidenav {
@@ -62,6 +63,10 @@
 
         #content {
             margin-left: 260px;
+            height: 100%;
+            position: fixed;
+            width: auto;
+            overflow-y: scroll;
         }
 
         .center {
@@ -109,17 +114,15 @@
         There are two ways that the robot can draw its path. <br>
         The default is the ideal path. 
         It draws a dot at the start of each step, and drags a line between the dot and itself across the ground untill it reaches its destination where it drops its end of the line.
-        It therefore draws the ideal pathe the robot could have taken between the points.
+        It therefore draws the ideal path the robot could have taken between the points.
     </p>
-    <!-- insert an image if ideal path -->
-    <image src="PenDownPic.png" class="center"></image>
+    <image src="Images/DrawingExample.png" class="center"></image>
     <p id="centerText">
         The actual path of the robot is not always strait. 
         Not only is the robot not necessarily pointed strait at its target when it starts its step, but also there are other robots it has to avoid.
         The actual drawing simply draws dots at the robot position at regular intervals.
     </p>
-    <!--insert image of actual path-->
-    <image src="" class="center"></image>
+    <image src="Images/DrawingActualExample.png" class="center"></image>
 </div>
 <script>
 </script>
