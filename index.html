@@ -416,7 +416,7 @@
       <block type="pen_up"></block>
       <block type="send_message"></block>
       <block type="wait_until_message"></block>
-      <!-- block type="wait"></block -->
+      <block type="wait"></block>
     </category>
 
 
@@ -481,8 +481,9 @@ class Robot:
         theta = t * 3.14/180
         self.name = name
         self.start_array = np.array([[x],[y],[theta],[drawing],[message]])
-        self.target_points.append((x,y,theta,drawing))
+        self.target_points.append((x,y,theta,drawing,message))
         self.output_points = np.array([[x],[y],[theta],[drawing],[message]])
+        self.waiting = 0
     
     #this block adds a target point to the target_points array for a specific robot
     def add_Target_Point(self,x,y,t,drawing,message):
@@ -506,7 +507,8 @@ class Robot:
     
     #This function moves the robot to the next step and if it is finished, it sets self.finished to true
     def step_Current_Point(self):
-        self.currentPoint = self.currentPoint + 1
+        if self.get_Target_Points()[self.currentPoint][3] >= -1:
+          self.currentPoint = self.currentPoint + 1
         if(self.currentPoint > self.totalPoints):
             self.finished = True
         if(not self.finished):
@@ -701,7 +703,25 @@ while time.time() < t_end:
     dxu = uni_barrier_cert(dxu, x)
     r.set_velocities(np.arange(len(robotList)), dxu)    
     
-    
+    #wait happens here
+    for i in range(len(robotList)):
+      if robotList[i].get_Status() == False:
+        if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] <= -3:
+          robotList[i].waiting =  (robotList[i].get_Target_Points()[robotList[i].currentPoint][3] + 3) * -1 
+          tempList = list(robotList[i].target_points[robotList[i].currentPoint])
+          tempList[3] = -2
+          robotList[i].target_points[robotList[i].currentPoint] = tuple(tempList)
+          print (robotList[i].target_points[robotList[i].currentPoint])
+          
+        if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] == -2:
+          #fix this
+          print(robotList[i].waiting)
+          robotList[i].waiting -= 33
+          if robotList[i].waiting <= 0:
+            tempList = list(robotList[i].target_points[robotList[i].currentPoint])
+            tempList[3] = -1
+            robotList[i].target_points[robotList[i].currentPoint] = tuple(tempList)
+
 
     #draws points at fixed intervals behind robots with their pen down
     if drawingType == "Actual":
