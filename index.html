@@ -5,8 +5,11 @@
   <meta charset="utf-8">
   <title>Robotarium Block Coading Interface</title>
   <link rel="icon" href="Help Pages/Images/robotariam_icon.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+    crossorigin="anonymous"></script>
   <!-- where all of the block files are found -->
   <script src="./node_modules/blockly/blockly_compressed.js"></script>
   <script src="./node_modules/blockly/blocks_compressed.js"></script>
@@ -48,7 +51,8 @@
         <a class="navbar-brand" href="#">
           <img src="Help Pages/Images/robotarium_header.png" sizes="" style="height: 40px; right: 10px;">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -66,7 +70,8 @@
               <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="Download()">Download Python</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 More
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -84,11 +89,10 @@
     </nav>
     <tr>
       <td style="width: 80%;">
-        <button class="btn btn-primary" style = "display: none;" id="refresh"
-          onclick="refreshCode()">Refresh Python</button>
-          <input type="file" name="file" id="file">
-          <button class="btn btn-primary" id="download"
-          onclick="downloadBlocks()">Download Blocks (XML in .txt)</button>
+        <button class="btn btn-primary" style="display: none;" id="refresh" onclick="refreshCode()">Refresh
+          Python</button>
+        <input type="file" name="file" id="file">
+        <button class="btn btn-primary" id="download" onclick="downloadBlocks()">Download Blocks (XML in .txt)</button>
         <sub id="loadingText" style="font-size: 8px; width: fit-content; margin-bottom: 10px;"></sub>
         </p>
       </td>
@@ -98,17 +102,14 @@
     </tr>
     <tr>
       <td style="width: 80%;">
-        <div class="form-group">
-          <label for="usr">Input Save Name:</label>
-          <input type="text" class="form-control" id="usr">
-        </div>
+
+        <select id="usr" onchange="getSave()">
+          <option> ---Choose Save--- </option>
+        </select>
+
         <p id="saveOutput"></p>
-        <button class="btn btn-primary"
-          onclick="writeSave(document.getElementById('usr').value)">Create Save</button>
-        <button class="btn btn-primary"
-          onclick="getSave(document.getElementById('usr').value)">Get Save</button>
-        <button class="btn btn-primary"
-          onclick="deleteSaveStr(document.getElementById('usr').value)">Delete Save</button>
+        <button class="btn btn-primary" onclick="writeSave()">Create Save</button>
+        <button class="btn btn-primary" onclick="deleteSaveStr()">Delete Save</button>
       </td>
   </table>
 
@@ -852,7 +853,7 @@ r.call_at_scripts_end()
 `;
 
       var code = initialize + Blockly.Python.workspaceToCode(demoWorkspace) + end;//puts all of code togeather
-      
+
       // var pythonFile = null;//creates python file
       // var data = new Blob([rpsString + code], { type: 'text/x-python' });
       // if (pythonFile !== null) {
@@ -866,63 +867,63 @@ r.call_at_scripts_end()
     showCode = true;
 
     function loadXHR(url) {
-      return new Promise(function(resolve, reject) {
+      return new Promise(function (resolve, reject) {
         try {
           var xhr = new XMLHttpRequest();
           xhr.open("GET", url);
           xhr.responseType = "blob";
-          xhr.onerror = function() {reject("Network error.")};
-          xhr.onload = function() {
-            if (xhr.status === 200) {resolve(xhr.response)}
-            else {reject("Loading error:" + xhr.statusText)}
+          xhr.onerror = function () { reject("Network error.") };
+          xhr.onload = function () {
+            if (xhr.status === 200) { resolve(xhr.response) }
+            else { reject("Loading error:" + xhr.statusText) }
           };
           xhr.send();
         }
-        catch(err) {reject(err.message)}
+        catch (err) { reject(err.message) }
       });
     }
 
-    function findImages(code){
+    function findImages(code) {
       flag = false;
       imageList = []
       charArray = []
-      for(let i = 0; i<code.length; i++){
-        if(flag){
+      for (let i = 0; i < code.length; i++) {
+        if (flag) {
           charArray.push(code.charAt(i));
         }
-        if(code.charAt(i) == '@'){
+        if (code.charAt(i) == '@') {
           flag = true;
-        }else if(code.charAt(i) == '&'){
+        } else if (code.charAt(i) == '&') {
           flag = false;
           imageList.push(charArray.join('').slice(0, charArray.join('').length - 1));
           charArray = [];
         }
       }
       newImageList = [];
-      for(let i = 0;i<imageList.length;i++){
-        if(newImageList.includes(imageList[i])){
+      for (let i = 0; i < imageList.length; i++) {
+        if (newImageList.includes(imageList[i])) {
 
-        }else{
+        } else {
           newImageList.push(imageList[i]);
         }
       }
-      return(newImageList);
+      return (newImageList);
     }
 
-    function Download(){
+    function Download() {
       console.log("download");
       var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"\"";
       var data = new Blob([rpsString + updateFile()], { type: 'text/x-python' });
-      saveAs(data,"output.py")
+      saveAs(data, "output.py")
       list = findImages(updateFile());
       l = 0;
       p = list.length
-      for(i =0;i<list.length;i++){
-        loadXHR('https://raw.githubusercontent.com/avayedawadi/BlockProject/main/Sprites/'+list[i]+'.png').then(function(blob) {
-          if(p <= 1){
-            saveAs(blob, String(list)+".png");
-          }else{
-            saveAs(blob, String(list[l])+".png");
+      for (i = 0; i < list.length; i++) {
+        loadXHR('https://raw.githubusercontent.com/avayedawadi/BlockProject/main/Sprites/' + list[i] + '.png').then(function (blob) {
+          if (p <= 1) {
+            saveAs(blob, String(list) + ".png");
+          } else {
+            saveAs(blob, String(list[l]) + ".png");
           }
           l++;
         });
@@ -948,136 +949,191 @@ r.call_at_scripts_end()
       }
     }
 
-    function refreshCode(){
+    function refreshCode() {
       document.getElementById("code").innerHTML = rpsString + updateFile();
     }
 
-    function saveCode(){
+    function saveCode() {
       var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
       var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
       window.localStorage.setItem("BlocklyCode", xmlText);
     }
 
-    function getSave(saveStr){
-      window.localStorage.setItem("mostRecent",saveStr);
+    function getSave() {
+      saveStr = document.getElementById('usr').value;
+      window.localStorage.setItem("mostRecent", saveStr);
       console.log(saveStr);
       xml = window.localStorage.getItem(saveStr);
       if (typeof xml != "string" || xml.length < 5) {
         alert("No save named " + saveStr + " is available.")
       }
 
-      
+
 
       try {
-          var dom = Blockly.Xml.textToDom(xml);
-          Blockly.mainWorkspace.clear();
-          Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);
-          return true;
-      } catch (e) {
-          return false;
-      }
-    }
-
-    function deleteSaveStr(saveStr){
-      function allStorage() {
-
-        var values = [],
-            keys = Object.keys(localStorage),
-            i = keys.length;
-
-        while ( i-- ) {
-            values.push( localStorage.getItem(keys[i]) );
-        }
-
-        return values;
-      }
-      if(typeof window.localStorage.getItem(saveStr) != "string"){
-        return false;
-      }
-        window.localStorage.removeItem(saveStr);
-        itemArr = allStorage();
-        console.log(itemArr);
-        if(itemArr.length != 0){
-          window.localStorage.setItem("mostRecent",itemArr[0][1])
-        }
-      }
-
-      
-
-    function writeSave(saveStr){
-      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
-        window.localStorage.setItem(saveStr, xmlText);
-        window.localStorage.setItem("mostRecent",saveStr);
-    }
-
-    function downloadBlocks(){
-      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
-      var data = new Blob([xmlText], { type: 'text/plain' });
-      saveAs(data,"blocks.txt");
-    }
-    document.getElementById('file')
-            .addEventListener('change', function() {
-              
-            var fr=new FileReader();
-            fr.onload=function(){
-                xml = fr.result;
-                console.log(xml);
-                if (typeof xml != "string" || xml.length < 5) {
-                    return false;
-                }
-
-                try {
-                    var dom = Blockly.Xml.textToDom(xml);
-                    Blockly.mainWorkspace.clear();
-                    Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-              }
-                
-              fr.readAsText(this.files[0]);
-            })
-
-    function clearSave(){
-      window.localStorage.clear();
-    }
-
-    window.onload = (event) => {
-      saveStr = window.localStorage.getItem("mostRecent");
-      xml = window.localStorage.getItem(saveStr);
-      if (typeof xml != "string" || xml.length < 5) {
-        return false;
-    }
-
-    try {
         var dom = Blockly.Xml.textToDom(xml);
         Blockly.mainWorkspace.clear();
         Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);
         return true;
-    } catch (e) {
+      } catch (e) {
         return false;
+      }
     }
+
+    function deleteSaveStr() {
+      saveStr = prompt("What save do you want to delete?")
+      var selectobject = document.getElementById("usr");
+      for (var i = 0; i < selectobject.length; i++) {
+        if (selectobject.options[i].value == saveStr)
+          selectobject.remove(i);
+      }
+      function allStorage() {
+
+        var values = [],
+          keys = Object.keys(localStorage),
+          i = keys.length;
+
+        while (i--) {
+          values.push(localStorage.getItem(keys[i]));
+        }
+
+        return keys;
+      }
+      if (typeof window.localStorage.getItem(saveStr) != "string") {
+        return false;
+      }
+      window.localStorage.removeItem(saveStr);
+      itemArr = allStorage();
+      console.log(itemArr);
+      if (itemArr.length != 0) {
+        for(let i = 0; i < itemArr.length; i++){
+          if(itemArr[0] != "mostRecent" && itemArr[0] != null){
+            window.localStorage.setItem("mostRecent", itemArr[0]);
+          }
+        }
+      }
+    }
+
+
+
+    function writeSave() {
+      let saveStr = prompt('What do you want to name your save?');
+      if(saveStr != null){
+        var x = document.getElementById("usr");
+        var option = document.createElement("option");
+        option.value = saveStr;
+        option.text = saveStr;
+        x.add(option);
+        var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+        window.localStorage.setItem(saveStr, xmlText);
+        window.localStorage.setItem("mostRecent", saveStr);
+      }
+      document.getElementById('usr').value=saveStr;
+    }
+
+    function downloadBlocks() {
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+      var data = new Blob([xmlText], { type: 'text/plain' });
+      saveAs(data, "blocks.txt");
+    }
+    document.getElementById('file')
+      .addEventListener('change', function () {
+
+        var fr = new FileReader();
+        fr.onload = function () {
+          xml = fr.result;
+          console.log(xml);
+          if (typeof xml != "string" || xml.length < 5) {
+            return false;
+          }
+
+          try {
+            var dom = Blockly.Xml.textToDom(xml);
+            Blockly.mainWorkspace.clear();
+            Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
+            return true;
+          } catch (e) {
+            return false;
+          }
+        }
+
+        fr.readAsText(this.files[0]);
+      })
+
+    function clearSave() {
+      window.localStorage.clear();
+      var selectobject = document.getElementById("usr");
+      for (var i = 0; i < selectobject.length; i++) {
+        selectobject.remove(i);
+      }
+    }
+
+    window.onload = (event) => {
+      function allStorage() {
+
+        var values = [],
+          keys = Object.keys(localStorage),
+          i = keys.length;
+
+        while (i--) {
+          values.push(localStorage.getItem(keys[i]));
+        }
+
+        return keys;
+      }
+
+      nameArr = allStorage();
+      console.log(nameArr);
+      var x = document.getElementById("usr");
+      for (let i = 0; i < nameArr.length; i++) {
+        if(nameArr[i] != "mostRecent"){
+          var option = document.createElement("option");
+          option.value = nameArr[i];
+          option.text = nameArr[i];
+          x.add(option);
+        }
+      }
+      saveStr = window.localStorage.getItem("mostRecent");
+      document.getElementById('usr').value=saveStr;
+      console.log(saveStr);
+      xml = window.localStorage.getItem(saveStr);
+      if (typeof xml != "string" || xml.length < 5) {
+        return false;
+      }
+
+      try {
+        var dom = Blockly.Xml.textToDom(xml);
+        Blockly.mainWorkspace.clear();
+        Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);
+        return true;
+      } catch (e) {
+        return false;
+      }
+
+
+
     };
 
     function recived() {//When recived 
       var myInterval = setInterval(function () {
         getLogs();
-        if(completed){
-          const myTimeout = setTimeout((()=>{var code = document.getElementById('video');
-          code.src = code.src;
-          document.getElementById("video").style.display = "block"//Show video
-          var code = document.getElementById('video');
-          code.src = code.src;
-          document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
-          document.getElementById("loadingText").innerHTML = "";//empty text box
-          window.scrollTo(0, 500);
-          clearInterval(myInterval);}), 3000);
-          
+        if (completed) {
+          const myTimeout = setTimeout((() => {
+            var code = document.getElementById('video');
+            code.src = code.src;
+            document.getElementById("video").style.display = "block"//Show video
+            var code = document.getElementById('video');
+            code.src = code.src;
+            document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
+            document.getElementById("loadingText").innerHTML = "";//empty text box
+            window.scrollTo(0, 500);
+            clearInterval(myInterval);
+          }), 3000);
+
         }
-        else if(error){
+        else if (error) {
           alert("There is an error with the code! Good luck!");
           clearInterval(myInterval);
           document.getElementById("loadingText").innerHTML = "";//empty text box
@@ -1131,10 +1187,10 @@ r.call_at_scripts_end()
       await fetch(url)
         .then(function (response) {
           response.text().then(function (text) {
-            if(text.includes("Your simulation will take approximately")){
+            if (text.includes("Your simulation will take approximately")) {
               completed = true;
             }
-            else if(text.includes("File")){
+            else if (text.includes("File")) {
               error = true;
             }
           });
@@ -1143,7 +1199,7 @@ r.call_at_scripts_end()
 
     }
 
-    window.onbeforeunload = function(){
+    window.onbeforeunload = function () {
       event.preventDefault();
     }
 
@@ -1152,7 +1208,7 @@ r.call_at_scripts_end()
       document.getElementById("video").style.display = "none"//hide video
       document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
       document.getElementById("loadingText").innerHTML = "Simulation Loading...";//empty text box
-      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \""+server_root+"\"";//the simulation code needs this line to not have rps
+      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \"" + server_root + "\"";//the simulation code needs this line to not have rps
       formdata.append("code", rpsStirngNorps + updateFile());//add to text file
       var requestOptions = {//create post 
         mode: 'no-cors',
