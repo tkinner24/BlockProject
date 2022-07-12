@@ -860,7 +860,7 @@ r.call_at_scripts_end()
     }
 
     function download(){
-      var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"\"";
+      var rpsString = "import rps.robotarium as robotarium\nImageRoot= \"./rps/examples/Custom_Test/Sprites/\"";
       var data = new Blob([rpsString + updateFile()], { type: 'text/x-python' });
       saveAs(data,"output.py")
       list = findImages(updateFile());
