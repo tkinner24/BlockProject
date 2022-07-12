@@ -63,7 +63,7 @@
               <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="simCode()">Simulate</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="Download()">Download</a>
+              <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="Download()">Download Python</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -86,14 +86,30 @@
       <td style="width: 80%;">
         <button class="btn btn-primary" style = "display: none;" id="refresh"
           onclick="refreshCode()">Refresh Python</button>
+          <input type="file" name="file" id="file">
+          <button class="btn btn-primary" id="download"
+          onclick="downloadBlocks()">Download Blocks (XML in .txt)</button>
         <sub id="loadingText" style="font-size: 8px; width: fit-content; margin-bottom: 10px;"></sub>
-        </td>
         </p>
       </td>
       <td style="width: 35%">
         <img onclick="enlargeImg()" id="img1" src="graph.png" style="height: 120px;">
       </td>
     </tr>
+    <tr>
+      <td style="width: 80%;">
+        <div class="form-group">
+          <label for="usr">Input Save Name:</label>
+          <input type="text" class="form-control" id="usr">
+        </div>
+        <p id="saveOutput"></p>
+        <button class="btn btn-primary"
+          onclick="writeSave(document.getElementById('usr').value)">Create Save</button>
+        <button class="btn btn-primary"
+          onclick="getSave(document.getElementById('usr').value)">Get Save</button>
+        <button class="btn btn-primary"
+          onclick="deleteSaveStr(document.getElementById('usr').value)">Delete Save</button>
+      </td>
   </table>
 
   <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
@@ -895,12 +911,96 @@ r.call_at_scripts_end()
       window.localStorage.setItem("BlocklyCode", xmlText);
     }
 
+    function getSave(saveStr){
+      window.localStorage.setItem("mostRecent",saveStr);
+      console.log(saveStr);
+      xml = window.localStorage.getItem(saveStr);
+      if (typeof xml != "string" || xml.length < 5) {
+        alert("No save named " + saveStr + " is available.")
+      }
+
+      
+
+      try {
+          var dom = Blockly.Xml.textToDom(xml);
+          Blockly.mainWorkspace.clear();
+          Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, dom);
+          return true;
+      } catch (e) {
+          return false;
+      }
+    }
+
+    function deleteSaveStr(saveStr){
+      function allStorage() {
+
+        var values = [],
+            keys = Object.keys(localStorage),
+            i = keys.length;
+
+        while ( i-- ) {
+            values.push( localStorage.getItem(keys[i]) );
+        }
+
+        return values;
+      }
+      if(typeof window.localStorage.getItem(saveStr) != "string"){
+        return false;
+      }
+        window.localStorage.removeItem(saveStr);
+        itemArr = allStorage();
+        console.log(itemArr);
+        if(itemArr.length != 0){
+          window.localStorage.setItem("mostRecent",itemArr[0][1])
+        }
+      }
+
+      
+
+    function writeSave(saveStr){
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+        window.localStorage.setItem(saveStr, xmlText);
+        window.localStorage.setItem("mostRecent",saveStr);
+    }
+
+    function downloadBlocks(){
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+      var data = new Blob([xmlText], { type: 'text/plain' });
+      saveAs(data,"blocks.txt");
+    }
+    document.getElementById('file')
+            .addEventListener('change', function() {
+              
+            var fr=new FileReader();
+            fr.onload=function(){
+                xml = fr.result;
+                console.log(xml);
+                if (typeof xml != "string" || xml.length < 5) {
+                    return false;
+                }
+
+                try {
+                    var dom = Blockly.Xml.textToDom(xml);
+                    Blockly.mainWorkspace.clear();
+                    Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+              }
+                
+              fr.readAsText(this.files[0]);
+            })
+
     function clearSave(){
       window.localStorage.clear();
     }
 
     window.onload = (event) => {
-      xml = window.localStorage.getItem("BlocklyCode");
+      saveStr = window.localStorage.getItem("mostRecent");
+      xml = window.localStorage.getItem(saveStr);
       if (typeof xml != "string" || xml.length < 5) {
         return false;
     }
