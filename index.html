@@ -693,6 +693,9 @@ while time.time() < t_end:
     if drawingType == "Ideal":
         for i in range(len(robotList)):
           if robotList[i].get_Status() == False:
+            if robotList[i].currentPoint != 0:
+              if robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][3] >= 0:
+                robotLines[i][0].set_data([robotList[i].get_Target_Points()[robotList[i].currentPoint - 2][0],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][0]],[robotList[i].get_Target_Points()[robotList[i].currentPoint - 2][1],robotList[i].get_Target_Points()[robotList[i].currentPoint - 1][1]])
             if robotList[i].get_Target_Points()[robotList[i].currentPoint][3] >= 0:
               if lineStepCache[i] != robotList[i].currentPoint:
                 tempColor = hex(int(robotList[i].get_Target_Points()[robotList[i].currentPoint][3]))
