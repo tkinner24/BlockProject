@@ -491,6 +491,7 @@ import matplotlib.lines as lines
 import numpy as np
 import time
 import math
+import mazeArrays
 
 #Here we define the Robot class in order to condense the code output by the blocks and make that easier to read
 class Robot:
@@ -650,6 +651,39 @@ def New_Robot(name, x,y,t,color):
 #adds passed in point to target array
 def Add_Target_Point(name, x,y,t,drawing, message):
     robotList[namesList.index(name)].add_Target_Point(x,y,t,drawing, message)
+
+
+def mazeCheck(mazeNum, pos, robotNum, error = 0.03):
+    cur_x = pos[0][robotNum]
+    cur_y = pos[1][robotNum]
+    mazeArray = mazeArrays.mazeArrays[mazeNum-1]
+
+    y_line = round((cur_y/0.02469)-40.5)*-1
+    y_line_minus = y_line-1
+    y_line_plus = y_line+1
+
+    for x in mazeArray[y_line]:
+        if(x+error >= cur_x > x-error):
+            return True
+    for x in mazeArray[y_line_minus]:
+        if(x+error >= cur_x > x-error):
+            return True
+    for x in mazeArray[y_line_plus]:
+       if(x+error >= cur_x > x-error):
+            return True
+    return False
+
+def mazeCheckEnd(pos,robotNum, error = 0.05):
+    cur_x = pos[0][robotNum]
+    cur_y = pos[1][robotNum]
+    if((0.28556+error >= cur_x > .11189-error) and (-0.75299+error >= cur_y > -0.92582-error)):
+        return True
+    return False
+
+IfMaze = False
+MazeNum = 0
+mazeFailed = False
+
 `;
       //This String goes after all of the block code and it has all of the running parts
       var end = `
@@ -674,6 +708,7 @@ ii = 0
 #used for actual to track drawing
 drawFrame = False
 
+mazeText = r.axes.text(0,.85,"", color="red", ha = "center", size="large", weight="bold")
 #for ideal drawing, it sets up a place for the step of the previous line to be stored
 if drawingType == "Ideal":
     lineStepCache = []
@@ -685,7 +720,7 @@ for s in shapesList:
 for l in lineList:
   r.axes.add_line(l)
 for i in imageList:
-  r.axes.imshow(i[0], extent=i[1])
+  r.axes.imshow(i[0], extent=i[1], zorder=-10)
 #loop that runs everything
 while time.time() < t_end:
   
@@ -784,6 +819,17 @@ while time.time() < t_end:
     r.step()
     if(Check_if_All_Done()):
         break
+    if(IfMaze):
+      for i in range(len(robotList)):
+        if(mazeCheck(MazeNum, x, i)):
+          mazeFailed = True;
+          mazeText.set(text = "Maze failed " + str(namesList[i]) + " drove over a line")
+        if(mazeCheckEnd(x,i)):
+          if(not mazeFailed):
+            mazeText.set(color = "green",text = "Maze Succeeded, Congratulations")
+
+    
+    
 #run at end of the program
 r.call_at_scripts_end()
 `;
