@@ -1010,8 +1010,7 @@ r.call_at_scripts_end()
     }
 
     function deleteSaveStr() {
-      saveStr = prompt("What save do you want to delete?")
-      var selectobject = document.getElementById("usr");
+      var selectobject = document.getElementById("dropbo");
       for (var i = 0; i < selectobject.length; i++) {
         if (selectobject.options[i].value == saveStr)
           selectobject.remove(i);
