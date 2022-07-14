@@ -78,12 +78,11 @@
                 Save
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="font-size: 15px">
-                <li><a class="dropdown-item" href="" onClick="writeSave()">Create Save</a></li>
-                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#DeleteModel" onclick="">Delete Save</button>
-                <li><a class="dropdown-item" href="" onClick="deleteSaveStr()">Delete Save</a></li>
-                <li><a class="dropdown-item" href="" onClick="clearSave()">Load Save</a></li>
-                <li><a class="dropdown-item" href="" onClick="downloadBlocks()">Export Blocks</a></li>
-                <li><a class="dropdown-item" href="" onClick="clearSave()">Import Blocks</a></li>
+                <li><button class="dropdown-item" href="" onClick="writeSave()">Create Save</button></li>
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#DeleteModel" onclick="updateDropdown()">Delete Save</button>
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#LoadModel" onclick="updateDropdown()">Load Save</button>
+                <li><button class="dropdown-item" href="" onClick="downloadBlocks()">Export Blocks</button></li>
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#ImportModel">Import Blocks</button>
               </ul>
             </li>
             <li class="nav-item dropdown" >
@@ -102,24 +101,14 @@
     <tr>
       <td style="width: 80%;">
         <button class="btn btn-primary" style="display: none;" id="refresh" onclick="refreshCode()">Refresh
-          Python</button>
-        <input type="file" name="file" id="file">
-        
+          Python</button>        
         <sub id="loadingText" style="font-size: 8px; width: fit-content; margin-bottom: 10px;"></sub>
         </p>
       </td>
       <td style="width: 35%">
-        <img onclick="enlargeImg()" id="img1" src="graph.png" style="height: 120px;">
+        <!-- <img id="img1" src="graph.png" style="height: 120px;"> /-->
       </td>
     </tr>
-    <tr>
-      <td style="width: 80%;">
-
-        <select id="usr" onchange="getSave()">
-          <option> ---Choose Save--- </option>
-        </select>
-
-      </td>
   </table>
 
   <div class="modal fade" id="DeleteModel" role="dialog">
@@ -130,10 +119,10 @@
           <h4 class="modal-title" style="text-align: left">Delete Save</h4>
         </div>
         <div class="modal-body">
-            <select id="dropdownFiles" onchange="getSave()">
+            <select id="dropdownFiles">
                 <option> ---Choose Save--- </option>
             </select>
-            <button type="button" class="btn btn-default" onclick="deleteSaveStr()">Delete</button> 
+            <button type="button" class="btn btn-default" onclick="deleteSaveStr()" data-dismiss="modal">Delete</button> 
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -141,6 +130,44 @@
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="LoadModel" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Load Save</h4>
+        </div>
+        <div class="modal-body">
+            <select id="dropdownFiles2" onchange="">
+                <option> ---Choose Save--- </option>
+            </select>
+            <button type="button" class="btn btn-default" onclick="getSave()" data-dismiss="modal">Load</button> 
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="ImportModel" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Import Blocks</h4>
+        </div>
+        <div class="modal-body">
+          <input type="file" name="file" id="file">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <div id="blocklyDiv" style="height: 600px; width: 100%;"></div>
   <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
@@ -989,7 +1016,7 @@ r.call_at_scripts_end()
     }
 
     function getSave() {
-      saveStr = document.getElementById('usr').value;
+      saveStr = document.getElementById('dropdownFiles2').value;
       window.localStorage.setItem("mostRecent", saveStr);
       console.log(saveStr);
       xml = window.localStorage.getItem(saveStr);
@@ -1010,11 +1037,9 @@ r.call_at_scripts_end()
     }
 
     function deleteSaveStr() {
-      var selectobject = document.getElementById("dropbo");
-      for (var i = 0; i < selectobject.length; i++) {
-        if (selectobject.options[i].value == saveStr)
-          selectobject.remove(i);
-      }
+      var selectobject = document.getElementById("dropdownFiles").value;
+      console.log(selectobject)
+      
       function allStorage() {
 
         var values = [],
@@ -1027,10 +1052,10 @@ r.call_at_scripts_end()
 
         return keys;
       }
-      if (typeof window.localStorage.getItem(saveStr) != "string") {
+      if (typeof window.localStorage.getItem(selectobject) != "string") {
         return false;
       }
-      window.localStorage.removeItem(saveStr);
+      window.localStorage.removeItem(selectobject);
       itemArr = allStorage();
       console.log(itemArr);
       if (itemArr.length != 0) {
@@ -1047,17 +1072,11 @@ r.call_at_scripts_end()
     function writeSave() {
       let saveStr = prompt('What do you want to name your save?');
       if(saveStr != null && window.localStorage.getItem(saveStr) == null){
-        var x = document.getElementById("usr");
-        var option = document.createElement("option");
-        option.value = saveStr;
-        option.text = saveStr;
-        x.add(option);
         var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
         var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
         window.localStorage.setItem(saveStr, xmlText);
         window.localStorage.setItem("mostRecent", saveStr);
       }
-      document.getElementById('usr').value=saveStr;
     }
 
     function downloadBlocks() {
@@ -1122,7 +1141,7 @@ r.call_at_scripts_end()
 
       nameArr = allStorage();
       console.log(nameArr);
-      var x = document.getElementById("usr");
+      var x = document.getElementById("dropdownFiles2");
       for (let i = 0; i < nameArr.length; i++) {
         if(nameArr[i] != "mostRecent"){
           var option = document.createElement("option");
@@ -1132,7 +1151,7 @@ r.call_at_scripts_end()
         }
       }
       saveStr = window.localStorage.getItem("mostRecent");
-      document.getElementById('usr').value=saveStr;
+      document.getElementById('dropdownFiles2').value=saveStr;
       console.log(saveStr);
       xml = window.localStorage.getItem(saveStr);
       if (typeof xml != "string" || xml.length < 5) {
@@ -1152,44 +1171,41 @@ r.call_at_scripts_end()
 
     };
 
+    function removeOptions(selectElement) {
+      var i, L = selectElement.options.length - 1;
+      for(i = L; i >= 0; i--) {
+          selectElement.remove(i);
+      }
+    }
+
     function updateDropdown(){
       nameArr = allStorage();
       console.log(nameArr);
       var x = document.getElementById("dropdownFiles");
+      removeOptions(x);
+      var y = document.getElementById("dropdownFiles2");
+      removeOptions(y);
       for (let i = 0; i < nameArr.length; i++) {
         if(nameArr[i] != "mostRecent"){
           var option = document.createElement("option");
           option.value = nameArr[i];
           option.text = nameArr[i];
           x.add(option);
+          y.add(option)
         }
       }
+
     }
 
-    function recived() {//When recived 
-      var myInterval = setInterval(function () {
-        getLogs();
-        if (completed) {
-          const myTimeout = setTimeout((() => {
+    function received(urlStr) {//When received
             var code = document.getElementById('video');
-            code.src = code.src;
+            code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4" ;
             document.getElementById("video").style.display = "block"//Show video
             var code = document.getElementById('video');
-            code.src = code.src;
-            document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
+            code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4";
+            //document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
             document.getElementById("loadingText").innerHTML = "";//empty text box
             window.scrollTo(0, 500);
-            clearInterval(myInterval);
-          }), 3000);
-
-        }
-        else if (error) {
-          alert("There is an error with the code! Good luck!");
-          clearInterval(myInterval);
-          document.getElementById("loadingText").innerHTML = "";//empty text box
-          document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
-        }
-      }, 5000);
     }
 
     function pingBackend() {
@@ -1256,22 +1272,23 @@ r.call_at_scripts_end()
     async function simCode() { //When Simulate Code is clicked send code to server to run simulation
       var formdata = new FormData();
       document.getElementById("video").style.display = "none"//hide video
-      document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
+      //document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
       document.getElementById("loadingText").innerHTML = "Simulation Loading...";//empty text box
-      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \"" + server_root + "\"";//the simulation code needs this line to not have rps
+      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \"" + "\"";//the simulation code needs this line to not have rps
       formdata.append("code", rpsStirngNorps + updateFile());//add to text file
-      var requestOptions = {//create post 
-        mode: 'no-cors',
+      var requestOptions = {//create post
+        //mode: 'no-cors',
         method: 'POST',
         body: formdata,
         redirect: 'follow'
       };
       try {
-        fetch("https://sim-server-robo.herokuapp.com/simulationVideo", requestOptions)//post
-          .then(result => recived())
-          .catch((error) => {
-            alert("There has been an error in the server, please try again later")
-          });
+        fetch("http://localhost:5000/simulationVideo", requestOptions)//post
+        .then(function(response) {
+            return response.text();
+          }).then(function(data) {
+            received(data)
+          })
       } catch (err) {
         alert("There has been an error in the server, please try again later")
       }
