@@ -97,7 +97,7 @@
         </p>
       </td>
       <td style="width: 35%">
-        <img onclick="enlargeImg()" id="img1" src="graph.png" style="height: 120px;">
+        <img id="img1" src="graph.png" style="height: 120px;">
       </td>
     </tr>
     <tr>
@@ -1120,30 +1120,16 @@ r.call_at_scripts_end()
 
     };
 
-    function recived() {//When recived 
-      var myInterval = setInterval(function () {
-        getLogs();
-        if (completed) {
-          const myTimeout = setTimeout((() => {
+    function received(urlStr) {//When received 
+
             var code = document.getElementById('video');
-            code.src = code.src;
+            code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4" ;
             document.getElementById("video").style.display = "block"//Show video
             var code = document.getElementById('video');
-            code.src = code.src;
-            document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
+            code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4";
+            //document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
             document.getElementById("loadingText").innerHTML = "";//empty text box
             window.scrollTo(0, 500);
-            clearInterval(myInterval);
-          }), 3000);
-
-        }
-        else if (error) {
-          alert("There is an error with the code! Good luck!");
-          clearInterval(myInterval);
-          document.getElementById("loadingText").innerHTML = "";//empty text box
-          document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
-        }
-      }, 5000);
     }
 
     function pingBackend() {
@@ -1210,22 +1196,23 @@ r.call_at_scripts_end()
     async function simCode() { //When Simulate Code is clicked send code to server to run simulation
       var formdata = new FormData();
       document.getElementById("video").style.display = "none"//hide video
-      document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
+      //document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
       document.getElementById("loadingText").innerHTML = "Simulation Loading...";//empty text box
-      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \"" + server_root + "\"";//the simulation code needs this line to not have rps
+      var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \"" + "\"";//the simulation code needs this line to not have rps
       formdata.append("code", rpsStirngNorps + updateFile());//add to text file
       var requestOptions = {//create post 
-        mode: 'no-cors',
+        //mode: 'no-cors',
         method: 'POST',
         body: formdata,
         redirect: 'follow'
       };
       try {
-        fetch("https://sim-server-robo.herokuapp.com/simulationVideo", requestOptions)//post
-          .then(result => recived())
-          .catch((error) => {
-            alert("There has been an error in the server, please try again later")
-          });
+        fetch("http://localhost:5000/simulationVideo", requestOptions)//post
+        .then(function(response) {
+            return response.text();
+          }).then(function(data) {
+            received(data)
+          })
       } catch (err) {
         alert("There has been an error in the server, please try again later")
       }
