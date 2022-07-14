@@ -1018,7 +1018,7 @@ r.call_at_scripts_end()
 
     function writeSave() {
       let saveStr = prompt('What do you want to name your save?');
-      if(saveStr != null){
+      if(saveStr != null && window.localStorage.getItem(saveStr) == null){
         var x = document.getElementById("usr");
         var option = document.createElement("option");
         option.value = saveStr;
@@ -1071,8 +1071,12 @@ r.call_at_scripts_end()
     }
 
     window.onload = (event) => {
+      if(window.localStorage.getItem('New Save') == null){
+        var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+        window.localStorage.setItem("New Save", xmlText);
+      }
       function allStorage() {
-
         var values = [],
           keys = Object.keys(localStorage),
           i = keys.length;
