@@ -18,6 +18,9 @@
   <script src="./node_modules/blockly/blocks/lists.js"></script>
   <script src="./node_modules/blockly/blocks/colour.js"></script>
   <script src=".\FileSaver.js-master\dist\FileSaver.js"></script>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script> 
 
   <!--This where the python that creates the output of the custom blocks-->
   <script src="./node_modules/blockly/generators/python/robotarium.js"></script>
@@ -55,7 +58,7 @@
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="font-size: 15px">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#">Home</a>
@@ -72,14 +75,23 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">
+                Save
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="font-size: 15px">
+                <li><a class="dropdown-item" href="" onClick="writeSave()">Create Save</a></li>
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#DeleteModel" onclick="">Delete Save</button>
+                <li><a class="dropdown-item" href="" onClick="deleteSaveStr()">Delete Save</a></li>
+                <li><a class="dropdown-item" href="" onClick="clearSave()">Load Save</a></li>
+                <li><a class="dropdown-item" href="" onClick="downloadBlocks()">Export Blocks</a></li>
+                <li><a class="dropdown-item" href="" onClick="clearSave()">Import Blocks</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown" >
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 More
               </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="" onClick="saveCode()">Save</a></li>
-                <li><a class="dropdown-item" href="" onClick="clearSave()">Clear Save</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="font-size: 15px">
                 <li><a class="dropdown-item" href="Help Pages/AboutTheRobotarium.html">Help</a></li>
               </ul>
             </li>
@@ -92,7 +104,7 @@
         <button class="btn btn-primary" style="display: none;" id="refresh" onclick="refreshCode()">Refresh
           Python</button>
         <input type="file" name="file" id="file">
-        <button class="btn btn-primary" id="download" onclick="downloadBlocks()">Download Blocks (XML in .txt)</button>
+        
         <sub id="loadingText" style="font-size: 8px; width: fit-content; margin-bottom: 10px;"></sub>
         </p>
       </td>
@@ -107,11 +119,28 @@
           <option> ---Choose Save--- </option>
         </select>
 
-        <p id="saveOutput"></p>
-        <button class="btn btn-primary" onclick="writeSave()">Create Save</button>
-        <button class="btn btn-primary" onclick="deleteSaveStr()">Delete Save</button>
       </td>
   </table>
+
+  <div class="modal fade" id="DeleteModel" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="text-align: left">Delete Save</h4>
+        </div>
+        <div class="modal-body">
+            <select id="dropdownFiles" onchange="getSave()">
+                <option> ---Choose Save--- </option>
+            </select>
+            <button type="button" class="btn btn-default" onclick="deleteSaveStr()">Delete</button> 
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="blocklyDiv" style="height: 600px; width: 100%;"></div>
   <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
@@ -1070,13 +1099,8 @@ r.call_at_scripts_end()
       }
     }
 
-    window.onload = (event) => {
-      if(window.localStorage.getItem('New Save') == null){
-        var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
-        window.localStorage.setItem("New Save", xmlText);
-      }
-      function allStorage() {
+
+    function allStorage() {
         var values = [],
           keys = Object.keys(localStorage),
           i = keys.length;
@@ -1087,6 +1111,15 @@ r.call_at_scripts_end()
 
         return keys;
       }
+
+    window.onload = (event) => {
+      updateDropdown()
+      if(window.localStorage.getItem('New Save') == null){
+        var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+        window.localStorage.setItem("New Save", xmlText);
+      }
+      
 
       nameArr = allStorage();
       console.log(nameArr);
@@ -1119,6 +1152,20 @@ r.call_at_scripts_end()
 
 
     };
+
+    function updateDropdown(){
+      nameArr = allStorage();
+      console.log(nameArr);
+      var x = document.getElementById("dropdownFiles");
+      for (let i = 0; i < nameArr.length; i++) {
+        if(nameArr[i] != "mostRecent"){
+          var option = document.createElement("option");
+          option.value = nameArr[i];
+          option.text = nameArr[i];
+          x.add(option);
+        }
+      }
+    }
 
     function recived() {//When recived 
       var myInterval = setInterval(function () {
