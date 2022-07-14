@@ -1185,12 +1185,16 @@ r.call_at_scripts_end()
       removeOptions(x);
       var y = document.getElementById("dropdownFiles2");
       removeOptions(y);
+      console.log(nameArr);
       for (let i = 0; i < nameArr.length; i++) {
         if(nameArr[i] != "mostRecent"){
           var option = document.createElement("option");
           option.value = nameArr[i];
           option.text = nameArr[i];
           x.add(option);
+          var option = document.createElement("option");
+          option.value = nameArr[i];
+          option.text = nameArr[i];
           y.add(option)
         }
       }
