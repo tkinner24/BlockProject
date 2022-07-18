@@ -78,7 +78,7 @@
                 Save
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="font-size: 15px">
-                <li><button class="dropdown-item" href="" onClick="writeSave()">Create Save</button></li>
+                <li><button class="dropdown-item" href="" data-toggle="modal" data-target="#SaveModal" onClick="writeSave()">Create Save</button></li>
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#DeleteModel" onclick="updateDropdown()">Delete Save</button>
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#LoadModel" onclick="updateDropdown()">Load Save</button>
                 <li><button class="dropdown-item" href="" onClick="downloadBlocks()">Export Blocks</button></li>
@@ -110,6 +110,33 @@
       </td>
     </tr>
   </table>
+
+  <div class="modal fade" id="SaveModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="text-align: left">Write Save</h4>
+        </div>
+        <div class="modal-body">
+            <select id="dropdownFiles3">
+                <option> ---Choose Save--- </option>
+            </select>
+            <button type="button" class="btn btn-default" onclick="overwriteSave()" data-dismiss="modal">Overwrite Save</button> 
+            <hr>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <button onclick="writeSave()" class="btn btn-default" type="button" data-dismiss="modal">New Save</button>
+              </div>
+              <input type="text" class="form-control" placeholder="New Save Name" aria-label="" aria-describedby="basic-addon1" id="saveInput">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="document.getElementById('saveInput').value = '';">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal fade" id="DeleteModel" role="dialog">
     <div class="modal-dialog">
@@ -1039,6 +1066,12 @@ r.call_at_scripts_end()
     function deleteSaveStr() {
       var selectobject = document.getElementById("dropdownFiles").value;
       console.log(selectobject)
+      var x = document.getElementById("dropdownFiles");
+      x.remove(x.selectedIndex);
+      var y = document.getElementById("dropdownFiles2");
+      y.remove(y.selectedIndex);
+      var z = document.getElementById("dropdownFiles3");
+      z.remove(z.selectedIndex);
       
       function allStorage() {
 
@@ -1055,7 +1088,7 @@ r.call_at_scripts_end()
       if (typeof window.localStorage.getItem(selectobject) != "string") {
         return false;
       }
-      window.localStorage.removeItem(selectobject);
+      window.localStorage.removeItem(selectobject)
       itemArr = allStorage();
       console.log(itemArr);
       if (itemArr.length != 0) {
@@ -1064,19 +1097,39 @@ r.call_at_scripts_end()
             window.localStorage.setItem("mostRecent", itemArr[0]);
           }
         }
-      }
+      };
     }
 
 
 
     function writeSave() {
-      let saveStr = prompt('What do you want to name your save?');
-      if(saveStr != null && window.localStorage.getItem(saveStr) == null){
+      saveStr = document.getElementById("saveInput").value;
+      document.getElementById('saveInput').value = '';
+      if(saveStr != null && saveStr.trim() != "" && window.localStorage.getItem(saveStr) == null){
         var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
         var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
         window.localStorage.setItem(saveStr, xmlText);
         window.localStorage.setItem("mostRecent", saveStr);
+
+        var option = document.createElement("option");
+        option.value = saveStr;
+        option.text = saveStr;
+        var x = document.getElementById("dropdownFiles");
+        x.appendChild(option)
+        var y = document.getElementById("dropdownFiles2");
+        y.appendChild(option);
+        var z = document.getElementById("dropdownFiles3");
+        z.appendChild(option);
       }
+    }
+
+    function overwriteSave(){
+      var selectobject = document.getElementById("dropdownFiles3").value;
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+      window.localStorage.setItem(selectobject, xmlText);
+      window.localStorage.setItem("mostRecent", selectobject);
+      document.getElementById("saveInput").value = "";
     }
 
     function downloadBlocks() {
@@ -1185,17 +1238,27 @@ r.call_at_scripts_end()
       removeOptions(x);
       var y = document.getElementById("dropdownFiles2");
       removeOptions(y);
+      var z = document.getElementById("dropdownFiles3");
+      removeOptions(z);
       console.log(nameArr);
       for (let i = 0; i < nameArr.length; i++) {
         if(nameArr[i] != "mostRecent"){
           var option = document.createElement("option");
           option.value = nameArr[i];
           option.text = nameArr[i];
-          x.add(option);
+          if(option.text != "New Save"){
+            x.appendChild(option);
+          }
           var option = document.createElement("option");
           option.value = nameArr[i];
           option.text = nameArr[i];
-          y.add(option)
+          y.appendChild(option);
+          var option = document.createElement("option");
+          option.value = nameArr[i];
+          option.text = nameArr[i];
+          if(option.text != "New Save"){
+            z.appendChild(option);
+          }
         }
       }
 
