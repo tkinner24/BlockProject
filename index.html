@@ -652,9 +652,10 @@ class Robot:
     def angle_In_Range(self, angle, accuracy = .07):
       if((self.target_points[self.currentPoint][2]-accuracy < angle < self.target_points[self.currentPoint][2]+accuracy)):
               return True     
-      elif(self.target_points[self.currentPoint][2] == math.pi):
-          if(math.pi-accuracy < math.fabs(angle) < math.pi+accuracy):
+      elif(((self.target_points[self.currentPoint][2]-accuracy+math.pi) < angle + 3* math.pi < (self.target_points[self.currentPoint][2]+accuracy+math.pi))):
               return True
+      elif(((self.target_points[self.currentPoint][2]-accuracy+math.pi) < angle - math.pi < (self.target_points[self.currentPoint][2]+accuracy+math.pi))):
+              return True        
       else:
           return False
 
