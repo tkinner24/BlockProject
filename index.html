@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Robotarium Block Coading Interface</title>
+  <title>Robotarium Block Coding Interface</title>
   <link rel="icon" href="Help Pages/Images/robotariam_icon.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -54,6 +54,8 @@
         <a class="navbar-brand" href="#">
           <img src="Help Pages/Images/robotarium_header.png" sizes="" style="height: 40px; right: 10px;">
         </a>
+        <sub id="loadingText" class="nav-item" style="color:whitesmoke; font-size: large;"></sub>
+        <img id="loadingGif" src="https://bison.usgs.gov/images/spinner2.gif" style="display: none; height: 40px; margin-left: 10px;">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -64,7 +66,13 @@
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="https://www.robotarium.gatech.edu/dashboard">Robotarium</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="flipCode()">Show Python</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="refresh" href="javascript:;" style="display: none;" onClick="refreshCode()">Refresh Python</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" id="ShowPButton" href="javascript:;" onClick="simCode()">Simulate</a>
@@ -81,6 +89,14 @@
                 <li><button class="dropdown-item" href="" onClick="writeSave()">Create Save</button></li>
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#DeleteModel" onclick="updateDropdown()">Delete Save</button>
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#LoadModel" onclick="updateDropdown()">Load Save</button>
+              </ul>
+            </li>
+            <li class="nav-item dropdown" >
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Import/Export
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="font-size: 15px">
                 <li><button class="dropdown-item" href="" onClick="downloadBlocks()">Export Blocks</button></li>
                 <button type="button" class="dropdown-item" data-toggle="modal" data-target="#ImportModel">Import Blocks</button>
               </ul>
@@ -99,12 +115,6 @@
       </div>
     </nav>
     <tr>
-      <td style="width: 80%;">
-        <button class="btn btn-primary" style="display: none;" id="refresh" onclick="refreshCode()">Refresh
-          Python</button>        
-        <sub id="loadingText" style="font-size: 8px; width: fit-content; margin-bottom: 10px;"></sub>
-        </p>
-      </td>
       <td style="width: 35%">
         <!-- <img id="img1" src="graph.png" style="height: 120px;"> /-->
       </td>
@@ -170,6 +180,9 @@
 
 
   <div id="blocklyDiv" style="height: 600px; width: 100%;"></div>
+  <div id="Map" style="width: 100%;">
+    <img src="./graph.png" style="display: block; margin-left: auto; margin-right: auto; width: 75%;">
+  </div>
   <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
     style="width:100%; height:500px;display: none"></iFrame>
   <pre style="width:50%;" class="prettyprint" id="code"></pre>
@@ -565,7 +578,7 @@ import matplotlib.lines as lines
 import numpy as np
 import time
 import math
-import mazeArrays
+
 
 #Here we define the Robot class in order to condense the code output by the blocks and make that easier to read
 class Robot:
@@ -995,7 +1008,7 @@ r.call_at_scripts_end()
         document.getElementById("code").innerHTML = rpsString + updateFile();
         showCode = !showCode;
         document.getElementById('ShowPButton').innerHTML = "Hide Python";
-        document.getElementById('refresh').style.display = 'inline'
+        document.getElementById('refresh').style.display = 'block'
       } else {
         showCode = !showCode;
         document.getElementById('ShowPButton').innerHTML = "Show Python";
@@ -1209,6 +1222,7 @@ r.call_at_scripts_end()
             code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4";
             //document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
             document.getElementById("loadingText").innerHTML = "";//empty text box
+            document.getElementById("loadingGif").style.display = "none"
             window.scrollTo(0, 500);
     }
 
@@ -1278,6 +1292,7 @@ r.call_at_scripts_end()
       document.getElementById("video").style.display = "none"//hide video
       //document.getElementById("loading").src = "https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595"//show loading gif
       document.getElementById("loadingText").innerHTML = "Simulation Loading...";//empty text box
+      document.getElementById("loadingGif").style.display = "block"
       var rpsStirngNorps = "import robotarium as robotarium\nImageRoot= \"" + "\"";//the simulation code needs this line to not have rps
       formdata.append("code", rpsStirngNorps + updateFile());//add to text file
       var requestOptions = {//create post
