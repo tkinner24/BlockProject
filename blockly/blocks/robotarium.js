@@ -1,0 +1,657 @@
+/**
+ * @license
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
+ * @fileoverview Variable blocks for Blockly.
+
+ * This file is scraped to extract a .json file of block definitions. The array
+ * passed to defineBlocksWithJsonArray(..) must be strict JSON: double quotes
+ * only, no outside references, no functions, no trailing commas, etc. The one
+ * exception is end-of-line comments, which the scraper will remove.
+ * @author fraser@google.com (Neil Fraser)
+ */
+'use strict';
+
+
+Blockly.defineBlocksWithJsonArray([
+  {
+    "type": "new_robot",
+    "message0": "Name of Robot:  %1 %2 Starting X Value: %3 %4 Starting Y Value: %5 %6 Starting Heading %7 %8",
+    "message0": "Name of Robot:  %1 %2 Starting X Value: %3 %4 Starting Y Value: %5 %6 Starting Heading %7 %8 Color:%9",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "name",
+        "text": "name"
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "x_val",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "y_val",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_angle",
+        "name": "theta",
+        "angle": 90
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_value",
+        "name": "color",
+        "align": "RIGHT"
+      }
+    ],
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Create a robot at X and Y with heading given",
+    "helpUrl": "Help%20Pages/NewRobotDoc.html"
+  },
+  {
+    "type": "run_to_point_and_angle",
+    "message0": "Move to: x: %1 y: %2 angle: %3",
+    "args0": [
+      {
+        "type": "field_number",
+        "name": "target_x",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "target_y",
+        "value": 0
+      },
+      {
+        "type": "field_angle",
+        "name": "angle",
+        "angle": 0
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Move robot to X and Y point and theta angle ",
+    "helpUrl": "Help%20Pages/MoveToPointAngle.html"
+  },
+  {
+    "type": "run_to_point",
+    "message0": "Move to: x: %1 y: %2",
+    "args0": [
+      {
+        "type": "field_number",
+        "name": "target_x",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "target_y",
+        "value": 0
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Move robot to X and Y point ",
+    "helpUrl": "Help%20Pages/MoveToPoint.html"
+  },
+  {
+    "type": "turn_by_angle",
+    "message0": "Turn: %1",
+    "args0": [
+      {
+        "type": "field_angle",
+        "name": "angle",
+        "angle": 90
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": "Help%20Pages/Turn.html"
+  },
+  {
+    "type": "display_image",
+    "message0": "Image: %1 %2 Bottom Left x: %3 y: %4 %5 Size %6",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "image",
+        "options": [
+          [
+            "Rock",
+            "RockSprite"
+          ],
+          [
+            "Tree",
+            "TreeSprite"
+          ],
+          [
+            "Log",
+            "LogSprite"
+          ],
+          [
+            "Maze 1",
+            "mase1"
+          ]
+        ]
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "x",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "y",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "s",
+        "value": 0
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "",
+    "helpUrl": "Help%20Pages/DisplayImage.html"
+  },
+  {
+    "type": "display_Maze",
+    "message0": "%1",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "maze",
+        "options": [
+          [
+            "Maze 1",
+            "1"
+          ],
+          [
+            "Maze 2",
+            "2"
+          ],
+          [
+            "Maze 3",
+            "3"
+          ],
+          [
+            "Maze 4",
+            "4"
+          ],
+          [
+            "Maze 5",
+            "5"
+          ],
+          [
+            "Maze 6",
+            "6"
+          ],
+          [
+            "Maze 7",
+            "7"
+          ],
+          [
+            "Maze 8",
+            "8"
+          ],
+          [
+            "Maze 9",
+            "9"
+          ],
+          [
+            "Maze 10",
+            "10"
+          ],
+        ]
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "",
+    "helpUrl": "Help%20Pages/Maze.html"
+  },
+  {
+    "type": "new_circle",
+    "message0": "Draw a circle %1 At x: %2 y: %3 %4 Radius of: %5 %6 Color: %7",
+    "args0": [
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "x",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "y",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "radius",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_value",
+        "name": "color",
+        "align": "RIGHT"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
+    "type": "new_line",
+    "message0": "Draw a line %1 From x: %2 y: %3 %4 To x: %5 y: %6 %7 Color: %8",
+    "args0": [
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "fx",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "fy",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "tx",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "ty",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_value",
+        "name": "color",
+        "align": "RIGHT"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
+    "type": "new_rec",
+    "message0": "Draw a rectangle %1 Corner at x: %2 y: %3 %4 Width of: %5 Height of: %6 %7 Orientation of: %8 %9 Color: %10",
+    "args0": [
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "x",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "y",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "w",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "h",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_angle",
+        "name": "NAME",
+        "angle": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_value",
+        "name": "color",
+        "align": "RIGHT"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
+    "type": "new_polygon",
+    "message0": "Draw a polygon with %1 sides %2 At x: %3 y: %4 %5 Radius of: %6 %7 Orientation of: %8 %9 Color: %10",
+    "args0": [
+      {
+        "type": "field_number",
+        "name": "sides",
+        "value": 3,
+        "min": 3,
+        "precision": 1
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "x",
+        "value": 0
+      },
+      {
+        "type": "field_number",
+        "name": "y",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "radius",
+        "value": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_angle",
+        "name": "angle",
+        "angle": 0
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_value",
+        "name": "color",
+        "align": "RIGHT"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
+    "type": "drawing_type",
+    "message0": "%1",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "D_type",
+        "options": [
+          [
+            "Ideal",
+            "Ideal"
+          ],
+          [
+            "Actual",
+            "Actual"
+          ]
+        ]
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "This box sets the drawing type. Ideal makes perfect straight lines, Actual follows the way the robot moved ",
+    "helpUrl": "Help%20Pages/Drawing.html"
+  },
+  {
+    "type": "move_forward",
+    "message0": "Move forward: %1",
+    "args0": [
+      {
+        "type": "field_number",
+        "name": "distance",
+        "value": 0
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": "Help%20Pages/MoveForward.html"
+  },
+  {
+    "type": "turn_to",
+    "message0": "Turn to: %1",
+    "args0": [
+      {
+        "type": "field_angle",
+        "name": "angle",
+        "angle": 90
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": "Help%20Pages/TurnTo.html"
+  },
+  {
+    "type": "wait",
+    "message0": "wait %1 seconds",
+    "args0": [
+      {
+        "type": "field_number",
+        "name": "seconds",
+        "value": 1
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
+    "type": "pen_down",
+    "message0": "Pen Down, Color: %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "color",
+        "align": "RIGHT"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Enter name of robot and move to x y point",
+    "helpUrl": "Help%20Pages/PenDown.html"
+  },
+  {
+    "type": "pen_up",
+    "message0": "Pen Up",
+    "colour": 230,
+    "previousStatement": null,
+    "nextStatement": null,
+
+    "tooltip": "Enter name of robot and move to x y point",
+    "helpUrl": "Help%20Pages/PenUp.html"
+  },
+  {
+    "type": "send_message",
+    "message0": "send message %1",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "message",
+        "check": "String"
+      }
+    ],
+    "colour": 230,
+    "previousStatement": null,
+    "nextStatement": null,
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
+    "type": "wait_until_message",
+    "message0": "wait until message %1 recived",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "message"
+      }
+    ],
+    "colour": 230,
+    "previousStatement": null,
+    "nextStatement": null,
+    "tooltip": "",
+    "helpUrl": ""
+  }  
+
+
+]);  // END JSON EXTRACT (Do not delete this comment.)
+
+/**
+ * Mixin to add context menu items to create getter/setter blocks for this
+ * setter/getter.
+ * Used by blocks 'variables_set' and 'variables_get'.
+ * @mixin
+ * @augments Blockly.Block
+ * @package
+ * @readonly
+ */
+Blockly.Constants.Variables.CUSTOM_CONTEXT_MENU_VARIABLE_GETTER_SETTER_MIXIN = {
+  /**
+   * Add menu option to create getter/setter block for this setter/getter.
+   * @param {!Array} options List of menu options to add to.
+   * @this {Blockly.Block}
+   */
+  customContextMenu: function(options) {
+    if (!this.isInFlyout) {
+      // Getter blocks have the option to create a setter block, and vice versa.
+      if (this.type == 'variables_get') {
+        var opposite_type = 'variables_set';
+        var contextMenuMsg = Blockly.Msg['VARIABLES_GET_CREATE_SET'];
+      } else {
+        var opposite_type = 'variables_get';
+        var contextMenuMsg = Blockly.Msg['VARIABLES_SET_CREATE_GET'];
+      }
+
+      var option = {enabled: this.workspace.remainingCapacity() > 0};
+      var name = this.getField('VAR').getText();
+      option.text = contextMenuMsg.replace('%1', name);
+      var xmlField = Blockly.utils.xml.createElement('field');
+      xmlField.setAttribute('name', 'VAR');
+      xmlField.appendChild(Blockly.utils.xml.createTextNode(name));
+      var xmlBlock = Blockly.utils.xml.createElement('block');
+      xmlBlock.setAttribute('type', opposite_type);
+      xmlBlock.appendChild(xmlField);
+      option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
+      options.push(option);
+      // Getter blocks have the option to rename or delete that variable.
+    } else {
+      if (this.type == 'variables_get' || this.type == 'variables_get_reporter') {
+        var renameOption = {
+          text: Blockly.Msg.RENAME_VARIABLE,
+          enabled: true,
+          callback: Blockly.Constants.Variables.RENAME_OPTION_CALLBACK_FACTORY(this)
+        };
+        var name = this.getField('VAR').getText();
+        var deleteOption = {
+          text: Blockly.Msg.DELETE_VARIABLE.replace('%1', name),
+          enabled: true,
+          callback: Blockly.Constants.Variables.DELETE_OPTION_CALLBACK_FACTORY(this)
+        };
+        options.unshift(renameOption);
+        options.unshift(deleteOption);
+      }
+    }
+  }
+};
+
+/**
+  * Callback for rename variable dropdown menu option associated with a
+  * variable getter block.
+  * @param {!Blockly.Block} block The block with the variable to rename.
+  * @return {!function()} A function that renames the variable.
+  */
+Blockly.Constants.Variables.RENAME_OPTION_CALLBACK_FACTORY = function(block) {
+  return function() {
+    var workspace = block.workspace;
+    var variable = block.getField('VAR').getVariable();
+    Blockly.Variables.renameVariable(workspace, variable);
+  };
+};
+
+/**
+ * Callback for delete variable dropdown menu option associated with a
+ * variable getter block.
+ * @param {!Blockly.Block} block The block with the variable to delete.
+ * @return {!function()} A function that deletes the variable.
+ */
+Blockly.Constants.Variables.DELETE_OPTION_CALLBACK_FACTORY = function(block) {
+  return function() {
+    var workspace = block.workspace;
+    var variable = block.getField('VAR').getVariable();
+    workspace.deleteVariableById(variable.getId());
+    workspace.refreshToolboxSelection();
+  };
+};
+
+// Blockly.Extensions.registerMixin('contextMenu_variableSetterGetter',
+//     Blockly.Constants.Variables.CUSTOM_CONTEXT_MENU_VARIABLE_GETTER_SETTER_MIXIN);
