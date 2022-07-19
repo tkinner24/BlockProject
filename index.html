@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
 
   <!--This where the python that creates the output of the custom blocks-->
   <script src="./blockly/generators/python/robotarium.js"></script>
@@ -205,7 +206,7 @@
     </div>
   </div>
 
-
+  <div id="pyplotdiv"><img id="pyplotfigure"/></div>
   <div id="blocklyDiv" style="height: 600px; width: 100%;"></div>
   <div id="Map" style="width: 100%;">
     <img src="./graph.png" style="display: block; margin-left: auto; margin-right: auto; width: 75%;">
@@ -577,6 +578,1414 @@
   </xml>
 
   <script>
+    async function main(){
+        let pyodide = await loadPyodide();
+        await pyodide.loadPackage('micropip');
+        await pyodide.loadPackage('numpy');
+        await pyodide.loadPackage('scipy');
+        await pyodide.loadPackage('matplotlib')
+        pyodide.runPythonAsync(`#import robotarium as robotarium
+import numpy as np
+#from cvxopt import matrix
+#from cvxopt.blas import dot
+#from cvxopt.solvers import qp, options
+#from cvxopt import matrix, sparse
+
+# Unused for now, will include later for speed.
+# import quadprog as solver2
+
+#import itertools
+import numpy as np
+from scipy.special import comb
+
+import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+
+import math
+pi = math.pi
+
+import math
+import time
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+#from robotarium_abc import *
+
+import io, base64
+
+# Robotarium This object provides routines to interface with the Robotarium.
+#
+# THIS CLASS SHOULD NEVER BE MODIFIED OR SUBMITTED
+
+import time
+import math
+from abc import ABC, abstractmethod
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
+#import utilities.misc as misc
+
+#from rps.utilities.transformations import *
+
+def create_si_to_uni_dynamics(linear_velocity_gain=1, angular_velocity_limit=np.pi):
+
+    #Check user input types
+    assert isinstance(linear_velocity_gain, (int, float)), "In the function create_si_to_uni_dynamics, the linear velocity gain (linear_velocity_gain) must be an integer or float. Recieved type %r." % type(linear_velocity_gain).__name__
+    assert isinstance(angular_velocity_limit, (int, float)), "In the function create_si_to_uni_dynamics, the angular velocity limit (angular_velocity_limit) must be an integer or float. Recieved type %r." % type(angular_velocity_limit).__name__
+
+    #Check user input ranges/sizes
+    assert linear_velocity_gain > 0, "In the function create_si_to_uni_dynamics, the linear velocity gain (linear_velocity_gain) must be positive. Recieved %r." % linear_velocity_gain
+    assert angular_velocity_limit >= 0, "In the function create_si_to_uni_dynamics, the angular velocity limit (angular_velocity_limit) must not be negative. Recieved %r." % angular_velocity_limit
+    
+
+    def si_to_uni_dyn(dxi, poses):
+
+        #Check user input types
+        assert isinstance(dxi, np.ndarray), "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics function, the single integrator velocity inputs (dxi) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(poses, np.ndarray), "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics function, the current robot poses (poses) must be a numpy array. Recieved type %r." % type(poses).__name__
+
+        #Check user input ranges/sizes
+        assert dxi.shape[0] == 2, "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics function, the dimension of the single integrator velocity inputs (dxi) must be 2 ([x_dot;y_dot]). Recieved dimension %r." % dxi.shape[0]
+        assert poses.shape[0] == 3, "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics function, the dimension of the current pose of each robot must be 3 ([x;y;theta]). Recieved dimension %r." % poses.shape[0]
+        assert dxi.shape[1] == poses.shape[1], "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics function, the number of single integrator velocity inputs must be equal to the number of current robot poses. Recieved a single integrator velocity input array of size %r x %r and current pose array of size %r x %r." % (dxi.shape[0], dxi.shape[1], poses.shape[0], poses.shape[1])
+
+        M,N = np.shape(dxi)
+
+        a = np.cos(poses[2, :])
+        b = np.sin(poses[2, :])
+
+        dxu = np.zeros((2, N))
+        dxu[0, :] = linear_velocity_gain*(a*dxi[0, :] + b*dxi[1, :])
+        dxu[1, :] = angular_velocity_limit*np.arctan2(-b*dxi[0, :] + a*dxi[1, :], dxu[0, :])/(np.pi/2)
+
+        return dxu
+
+    return si_to_uni_dyn
+
+def create_si_to_uni_dynamics_with_backwards_motion(linear_velocity_gain=1, angular_velocity_limit=np.pi):
+
+    #Check user input types
+    assert isinstance(linear_velocity_gain, (int, float)), "In the function create_si_to_uni_dynamics, the linear velocity gain (linear_velocity_gain) must be an integer or float. Recieved type %r." % type(linear_velocity_gain).__name__
+    assert isinstance(angular_velocity_limit, (int, float)), "In the function create_si_to_uni_dynamics, the angular velocity limit (angular_velocity_limit) must be an integer or float. Recieved type %r." % type(angular_velocity_limit).__name__
+
+    #Check user input ranges/sizes
+    assert linear_velocity_gain > 0, "In the function create_si_to_uni_dynamics, the linear velocity gain (linear_velocity_gain) must be positive. Recieved %r." % linear_velocity_gain
+    assert angular_velocity_limit >= 0, "In the function create_si_to_uni_dynamics, the angular velocity limit (angular_velocity_limit) must not be negative. Recieved %r." % angular_velocity_limit
+    
+
+    def si_to_uni_dyn(dxi, poses):
+
+        #Check user input types
+        assert isinstance(dxi, np.ndarray), "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics_with_backwards_motion function, the single integrator velocity inputs (dxi) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(poses, np.ndarray), "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics_with_backwards_motion function, the current robot poses (poses) must be a numpy array. Recieved type %r." % type(poses).__name__
+
+        #Check user input ranges/sizes
+        assert dxi.shape[0] == 2, "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics_with_backwards_motion function, the dimension of the single integrator velocity inputs (dxi) must be 2 ([x_dot;y_dot]). Recieved dimension %r." % dxi.shape[0]
+        assert poses.shape[0] == 3, "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics_with_backwards_motion function, the dimension of the current pose of each robot must be 3 ([x;y;theta]). Recieved dimension %r." % poses.shape[0]
+        assert dxi.shape[1] == poses.shape[1], "In the si_to_uni_dyn function created by the create_si_to_uni_dynamics_with_backwards_motion function, the number of single integrator velocity inputs must be equal to the number of current robot poses. Recieved a single integrator velocity input array of size %r x %r and current pose array of size %r x %r." % (dxi.shape[0], dxi.shape[1], poses.shape[0], poses.shape[1])
+
+        M,N = np.shape(dxi)
+
+        a = np.cos(poses[2, :])
+        b = np.sin(poses[2, :])
+
+        dxu = np.zeros((2, N))
+        dxu[0, :] = linear_velocity_gain*(a*dxi[0, :] + b*dxi[1, :])
+        dxu[1, :] = angular_velocity_limit*np.arctan2(-b*dxi[0, :] + a*dxi[1, :], dxu[0, :])/(np.pi/2)
+
+        return dxu
+
+    return si_to_uni_dyn
+
+def create_si_to_uni_mapping(projection_distance=0.05, angular_velocity_limit = np.pi):
+
+    #Check user input types
+    assert isinstance(projection_distance, (int, float)), "In the function create_si_to_uni_mapping, the projection distance of the new control point (projection_distance) must be an integer or float. Recieved type %r." % type(projection_distance).__name__
+    assert isinstance(angular_velocity_limit, (int, float)), "In the function create_si_to_uni_mapping, the maximum angular velocity command (angular_velocity_limit) must be an integer or float. Recieved type %r." % type(angular_velocity_limit).__name__
+    
+    #Check user input ranges/sizes
+    assert projection_distance > 0, "In the function create_si_to_uni_mapping, the projection distance of the new control point (projection_distance) must be positive. Recieved %r." % projection_distance
+    assert projection_distance >= 0, "In the function create_si_to_uni_mapping, the maximum angular velocity command (angular_velocity_limit) must be greater than or equal to zero. Recieved %r." % angular_velocity_limit
+
+    def si_to_uni_dyn(dxi, poses):
+
+        #Check user input types
+        assert isinstance(dxi, np.ndarray), "In the si_to_uni_dyn function created by the create_si_to_uni_mapping function, the single integrator velocity inputs (dxi) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(poses, np.ndarray), "In the si_to_uni_dyn function created by the create_si_to_uni_mapping function, the current robot poses (poses) must be a numpy array. Recieved type %r." % type(poses).__name__
+
+        #Check user input ranges/sizes
+        assert dxi.shape[0] == 2, "In the si_to_uni_dyn function created by the create_si_to_uni_mapping function, the dimension of the single integrator velocity inputs (dxi) must be 2 ([x_dot;y_dot]). Recieved dimension %r." % dxi.shape[0]
+        assert poses.shape[0] == 3, "In the si_to_uni_dyn function created by the create_si_to_uni_mapping function, the dimension of the current pose of each robot must be 3 ([x;y;theta]). Recieved dimension %r." % poses.shape[0]
+        assert dxi.shape[1] == poses.shape[1], "In the si_to_uni_dyn function created by the create_si_to_uni_mapping function, the number of single integrator velocity inputs must be equal to the number of current robot poses. Recieved a single integrator velocity input array of size %r x %r and current pose array of size %r x %r." % (dxi.shape[0], dxi.shape[1], poses.shape[0], poses.shape[1])
+
+
+        M,N = np.shape(dxi)
+
+        cs = np.cos(poses[2, :])
+        ss = np.sin(poses[2, :])
+
+        dxu = np.zeros((2, N))
+        dxu[0, :] = (cs*dxi[0, :] + ss*dxi[1, :])
+        dxu[1, :] = (1/projection_distance)*(-ss*dxi[0, :] + cs*dxi[1, :])
+
+        #Impose angular velocity cap.
+        dxu[1,dxu[1,:]>angular_velocity_limit] = angular_velocity_limit
+        dxu[1,dxu[1,:]<-angular_velocity_limit] = -angular_velocity_limit 
+
+        return dxu
+
+    def uni_to_si_states(poses):
+
+        _,N = np.shape(poses)
+
+        si_states = np.zeros((2, N))
+        si_states[0, :] = poses[0, :] + projection_distance*np.cos(poses[2, :])
+        si_states[1, :] = poses[1, :] + projection_distance*np.sin(poses[2, :])
+
+        return si_states
+
+    return si_to_uni_dyn, uni_to_si_states
+
+def create_uni_to_si_dynamics(projection_distance=0.05):
+
+    #Check user input types
+    assert isinstance(projection_distance, (int, float)), "In the function create_uni_to_si_dynamics, the projection distance of the new control point (projection_distance) must be an integer or float. Recieved type %r." % type(projection_distance).__name__
+    
+    #Check user input ranges/sizes
+    assert projection_distance > 0, "In the function create_uni_to_si_dynamics, the projection distance of the new control point (projection_distance) must be positive. Recieved %r." % projection_distance
+    
+
+    def uni_to_si_dyn(dxu, poses):
+
+        #Check user input types
+        assert isinstance(dxu, np.ndarray), "In the uni_to_si_dyn function created by the create_uni_to_si_dynamics function, the unicycle velocity inputs (dxu) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(poses, np.ndarray), "In the uni_to_si_dyn function created by the create_uni_to_si_dynamics function, the current robot poses (poses) must be a numpy array. Recieved type %r." % type(poses).__name__
+
+        #Check user input ranges/sizes
+        assert dxu.shape[0] == 2, "In the uni_to_si_dyn function created by the create_uni_to_si_dynamics function, the dimension of the unicycle velocity inputs (dxu) must be 2 ([v;w]). Recieved dimension %r." % dxu.shape[0]
+        assert poses.shape[0] == 3, "In the uni_to_si_dyn function created by the create_uni_to_si_dynamics function, the dimension of the current pose of each robot must be 3 ([x;y;theta]). Recieved dimension %r." % poses.shape[0]
+        assert dxu.shape[1] == poses.shape[1], "In the uni_to_si_dyn function created by the create_uni_to_si_dynamics function, the number of unicycle velocity inputs must be equal to the number of current robot poses. Recieved a unicycle velocity input array of size %r x %r and current pose array of size %r x %r." % (dxu.shape[0], dxu.shape[1], poses.shape[0], poses.shape[1])
+
+        
+        M,N = np.shape(dxu)
+
+        cs = np.cos(poses[2, :])
+        ss = np.sin(poses[2, :])
+
+        dxi = np.zeros((2, N))
+        dxi[0, :] = (cs*dxu[0, :] - projection_distance*ss*dxu[1, :])
+        dxi[1, :] = (ss*dxu[0, :] + projection_distance*cs*dxu[1, :])
+
+        return dxi
+
+    return uni_to_si_dyn
+
+
+# Disable output of CVXOPT
+#options['show_progress'] = False
+# Change default options of CVXOPT for faster solving
+#options['reltol'] = 1e-2 # was e-2
+#options['feastol'] = 1e-2 # was e-4
+#options['maxiters'] = 50 # default is 100
+
+def create_single_integrator_barrier_certificate(barrier_gain=100, safety_radius=0.17, magnitude_limit=0.2):
+
+    #Check user input types
+    assert isinstance(barrier_gain, (int, float)), "In the function create_single_integrator_barrier_certificate, the barrier gain (barrier_gain) must be an integer or float. Recieved type %r." % type(barrier_gain).__name__
+    assert isinstance(safety_radius, (int, float)), "In the function create_single_integrator_barrier_certificate, the safe distance between robots (safety_radius) must be an integer or float. Recieved type %r." % type(safety_radius).__name__
+    assert isinstance(magnitude_limit, (int, float)), "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be an integer or float. Recieved type %r." % type(magnitude_limit).__name__
+
+    #Check user input ranges/sizes
+    assert barrier_gain > 0, "In the function create_single_integrator_barrier_certificate, the barrier gain (barrier_gain) must be positive. Recieved %r." % barrier_gain
+    assert safety_radius >= 0.12, "In the function create_single_integrator_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m) plus the distance to the look ahead point used in the diffeomorphism if that is being used. Recieved %r." % safety_radius
+    assert magnitude_limit > 0, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
+    assert magnitude_limit <= 0.2, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+
+
+    def f(dxi, x):
+        #Check user input types
+        assert isinstance(dxi, np.ndarray), "In the function created by the create_single_integrator_barrier_certificate function, the single-integrator robot velocity command (dxi) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(x, np.ndarray), "In the function created by the create_single_integrator_barrier_certificate function, the robot states (x) must be a numpy array. Recieved type %r." % type(x).__name__
+
+        #Check user input ranges/sizes
+        assert x.shape[0] == 2, "In the function created by the create_single_integrator_barrier_certificate function, the dimension of the single integrator robot states (x) must be 2 ([x;y]). Recieved dimension %r." % x.shape[0]
+        assert dxi.shape[0] == 2, "In the function created by the create_single_integrator_barrier_certificate function, the dimension of the robot single integrator velocity command (dxi) must be 2 ([x_dot;y_dot]). Recieved dimension %r." % dxi.shape[0]
+        assert x.shape[1] == dxi.shape[1], "In the function created by the create_single_integrator_barrier_certificate function, the number of robot states (x) must be equal to the number of robot single integrator velocity commands (dxi). Recieved a current robot pose input array (x) of size %r x %r and single integrator velocity array (dxi) of size %r x %r." % (x.shape[0], x.shape[1], dxi.shape[0], dxi.shape[1])
+
+        
+        # Initialize some variables for computational savings
+        N = dxi.shape[1]
+        num_constraints = int(comb(N, 2))
+        A = np.zeros((num_constraints, 2*N))
+        b = np.zeros(num_constraints)
+        H = sparse(matrix(2*np.identity(2*N)))
+
+        count = 0
+        for i in range(N-1):
+            for j in range(i+1, N):
+                error = x[:, i] - x[:, j]
+                h = (error[0]*error[0] + error[1]*error[1]) - np.power(safety_radius, 2)
+
+                A[count, (2*i, (2*i+1))] = -2*error
+                A[count, (2*j, (2*j+1))] = 2*error
+                b[count] = barrier_gain*np.power(h, 3)
+
+                count += 1
+
+        # Threshold control inputs before QP
+        norms = np.linalg.norm(dxi, 2, 0)
+        idxs_to_normalize = (norms > magnitude_limit)
+        dxi[:, idxs_to_normalize] *= magnitude_limit/norms[idxs_to_normalize]
+
+        f = -2*np.reshape(dxi, 2*N, order='F')
+        result = qp(H, matrix(f), matrix(A), matrix(b))['x']
+
+        return np.reshape(result, (2, -1), order='F')
+
+    return f
+
+def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=100, safety_radius=0.17, magnitude_limit=0.2, boundary_points = np.array([-1.6, 1.6, -1.0, 1.0])):
+
+    #Check user input types
+    assert isinstance(barrier_gain, (int, float)), "In the function create_single_integrator_barrier_certificate, the barrier gain (barrier_gain) must be an integer or float. Recieved type %r." % type(barrier_gain).__name__
+    assert isinstance(safety_radius, (int, float)), "In the function create_single_integrator_barrier_certificate, the safe distance between robots (safety_radius) must be an integer or float. Recieved type %r." % type(safety_radius).__name__
+    assert isinstance(magnitude_limit, (int, float)), "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be an integer or float. Recieved type %r." % type(magnitude_limit).__name__
+
+    #Check user input ranges/sizes
+    assert barrier_gain > 0, "In the function create_single_integrator_barrier_certificate, the barrier gain (barrier_gain) must be positive. Recieved %r." % barrier_gain
+    assert safety_radius >= 0.12, "In the function create_single_integrator_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m) plus the distance to the look ahead point used in the diffeomorphism if that is being used. Recieved %r." % safety_radius
+    assert magnitude_limit > 0, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
+    assert magnitude_limit <= 0.2, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+
+
+    def f(dxi, x):
+        #Check user input types
+        assert isinstance(dxi, np.ndarray), "In the function created by the create_single_integrator_barrier_certificate function, the single-integrator robot velocity command (dxi) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(x, np.ndarray), "In the function created by the create_single_integrator_barrier_certificate function, the robot states (x) must be a numpy array. Recieved type %r." % type(x).__name__
+
+        #Check user input ranges/sizes
+        assert x.shape[0] == 2, "In the function created by the create_single_integrator_barrier_certificate function, the dimension of the single integrator robot states (x) must be 2 ([x;y]). Recieved dimension %r." % x.shape[0]
+        assert dxi.shape[0] == 2, "In the function created by the create_single_integrator_barrier_certificate function, the dimension of the robot single integrator velocity command (dxi) must be 2 ([x_dot;y_dot]). Recieved dimension %r." % dxi.shape[0]
+        assert x.shape[1] == dxi.shape[1], "In the function created by the create_single_integrator_barrier_certificate function, the number of robot states (x) must be equal to the number of robot single integrator velocity commands (dxi). Recieved a current robot pose input array (x) of size %r x %r and single integrator velocity array (dxi) of size %r x %r." % (x.shape[0], x.shape[1], dxi.shape[0], dxi.shape[1])
+
+        
+        # Initialize some variables for computational savings
+        N = dxi.shape[1]
+        num_constraints = int(comb(N, 2)) + 4*N
+        A = np.zeros((num_constraints, 2*N))
+        b = np.zeros(num_constraints)
+        #H = sparse(matrix(2*np.identity(2*N)))
+        H = 2*np.identity(2*N)
+
+        count = 0
+        for i in range(N-1):
+            for j in range(i+1, N):
+                error = x[:, i] - x[:, j]
+                h = (error[0]*error[0] + error[1]*error[1]) - np.power(safety_radius, 2)
+
+                A[count, (2*i, (2*i+1))] = -2*error
+                A[count, (2*j, (2*j+1))] = 2*error
+                b[count] = barrier_gain*np.power(h, 3)
+
+                count += 1
+        
+        for k in range(N):
+            #Pos Y
+            A[count, (2*k, 2*k+1)] = np.array([0,1])
+            b[count] = 0.4*barrier_gain*(boundary_points[3] - safety_radius/2 - x[1,k])**3;
+            count += 1
+
+            #Neg Y
+            A[count, (2*k, 2*k+1)] = -np.array([0,1])
+            b[count] = 0.4*barrier_gain*(-boundary_points[2] - safety_radius/2 + x[1,k])**3;
+            count += 1
+
+            #Pos X
+            A[count, (2*k, 2*k+1)] = np.array([1,0])
+            b[count] = 0.4*barrier_gain*(boundary_points[1] - safety_radius/2 - x[0,k])**3;
+            count += 1
+
+            #Neg X
+            A[count, (2*k, 2*k+1)] = -np.array([1,0])
+            b[count] = 0.4*barrier_gain*(-boundary_points[0] - safety_radius/2 + x[0,k])**3;
+            count += 1
+        
+        # Threshold control inputs before QP
+        norms = np.linalg.norm(dxi, 2, 0)
+        idxs_to_normalize = (norms > magnitude_limit)
+        dxi[:, idxs_to_normalize] *= magnitude_limit/norms[idxs_to_normalize]
+
+        f = -2*np.reshape(dxi, (2*N,1), order='F')
+        b = np.reshape(b, (count,1), order='F')
+        result = qp(matrix(H), matrix(f), matrix(A), matrix(b))['x']
+        #result = solver2.solve_qp(H, f, A, b, 0)[0]
+
+        return np.reshape(result, (2, N), order='F')
+
+    return f
+
+def create_single_integrator_barrier_certificate2(barrier_gain=100, unsafe_barrier_gain=1e6, safety_radius=0.17, magnitude_limit=0.2):
+
+    #Check user input types
+    assert isinstance(barrier_gain, (int, float)), "In the function create_single_integrator_barrier_certificate2, the barrier gain inside the safe set (barrier_gain) must be an integer or float. Recieved type %r." % type(barrier_gain).__name__
+    assert isinstance(unsafe_barrier_gain, (int, float)), "In the function create_single_integrator_barrier_certificate2, the barrier gain if outside the safe set (unsafe_barrier_gain) must be an integer or float. Recieved type %r." % type(unsafe_barrier_gain).__name__
+    assert isinstance(safety_radius, (int, float)), "In the function create_single_integrator_barrier_certificate2, the safe distance between robots (safety_radius) must be an integer or float. Recieved type %r." % type(safety_radius).__name__
+    assert isinstance(magnitude_limit, (int, float)), "In the function create_single_integrator_barrier_certificate2, the maximum linear velocity of the robot (magnitude_limit) must be an integer or float. Recieved type %r." % type(magnitude_limit).__name__
+
+    #Check user input ranges/sizes
+    assert barrier_gain > 0, "In the function create_single_integrator_barrier_certificate2, the barrier gain inside the safe set (barrier_gain) must be positive. Recieved %r." % barrier_gain
+    assert unsafe_barrier_gain > 0, "In the function create_single_integrator_barrier_certificate2, the barrier gain if outside the safe set (unsafe_barrier_gain) must be positive. Recieved %r." % unsafe_barrier_gain
+    assert safety_radius >= 0.12, "In the function create_single_integrator_barrier_certificate2, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m) plus the distance to the look ahead point used in the diffeomorphism if that is being used. Recieved %r." % safety_radius
+    assert magnitude_limit > 0, "In the function create_single_integrator_barrier_certificate2, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
+    assert magnitude_limit <= 0.2, "In the function create_single_integrator_barrier_certificate2, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+
+
+    def f(dxi, x):
+        #Check user input types
+        assert isinstance(dxi, np.ndarray), "In the function created by the create_single_integrator_barrier_certificate2 function, the single-integrator robot velocity command (dxi) must be a numpy array. Recieved type %r." % type(dxi).__name__
+        assert isinstance(x, np.ndarray), "In the function created by the create_single_integrator_barrier_certificate2 function, the robot states (x) must be a numpy array. Recieved type %r." % type(x).__name__
+
+        #Check user input ranges/sizes
+        assert x.shape[0] == 2, "In the function created by the create_single_integrator_barrier_certificate2 function, the dimension of the single integrator robot states (x) must be 2 ([x;y]). Recieved dimension %r." % x.shape[0]
+        assert dxi.shape[0] == 2, "In the function created by the create_single_integrator_barrier_certificate2 function, the dimension of the robot single integrator velocity command (dxi) must be 2 ([x_dot;y_dot]). Recieved dimension %r." % dxi.shape[0]
+        assert x.shape[1] == dxi.shape[1], "In the function created by the create_single_integrator_barrier_certificate2 function, the number of robot states (x) must be equal to the number of robot single integrator velocity commands (dxi). Recieved a current robot pose input array (x) of size %r x %r and single integrator velocity array (dxi) of size %r x %r." % (x.shape[0], x.shape[1], dxi.shape[0], dxi.shape[1])
+
+        
+        # Initialize some variables for computational savings
+        N = dxi.shape[1]
+        num_constraints = int(comb(N, 2))
+        A = np.zeros((num_constraints, 2*N))
+        b = np.zeros(num_constraints)
+        H = sparse(matrix(2*np.identity(2*N)))
+
+        count = 0
+        for i in range(N-1):
+            for j in range(i+1, N):
+                error = x[:, i] - x[:, j]
+                h = (error[0]*error[0] + error[1]*error[1]) - np.power(safety_radius, 2)
+
+                A[count, (2*i, (2*i+1))] = -2*error
+                A[count, (2*j, (2*j+1))] = 2*error
+                if h >= 0:
+                    b[count] = barrier_gain*np.power(h, 3)
+                else:
+                    b[count] = unsafe_barrier_gain*np.power(h, 3)
+
+                count += 1
+
+        # Threshold control inputs before QP
+        norms = np.linalg.norm(dxi, 2, 0)
+        idxs_to_normalize = (norms > magnitude_limit)
+        dxi[:, idxs_to_normalize] *= magnitude_limit/norms[idxs_to_normalize]
+
+        f = -2*np.reshape(dxi, 2*N, order='F')
+        result = qp(H, matrix(f), matrix(A), matrix(b))['x']
+
+        return np.reshape(result, (2, -1), order='F')
+
+    return f
+
+def create_unicycle_barrier_certificate(barrier_gain=100, safety_radius=0.12, projection_distance=0.05, magnitude_limit=0.2):
+
+    #Check user input types
+    assert isinstance(barrier_gain, (int, float)), "In the function create_unicycle_barrier_certificate, the barrier gain (barrier_gain) must be an integer or float. Recieved type %r." % type(barrier_gain).__name__
+    assert isinstance(safety_radius, (int, float)), "In the function create_unicycle_barrier_certificate, the safe distance between robots (safety_radius) must be an integer or float. Recieved type %r." % type(safety_radius).__name__
+    assert isinstance(projection_distance, (int, float)), "In the function create_unicycle_barrier_certificate, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be an integer or float. Recieved type %r." % type(projection_distance).__name__
+    assert isinstance(magnitude_limit, (int, float)), "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be an integer or float. Recieved type %r." % type(magnitude_limit).__name__
+
+    #Check user input ranges/sizes
+    assert barrier_gain > 0, "In the function create_unicycle_barrier_certificate, the barrier gain (barrier_gain) must be positive. Recieved %r." % barrier_gain
+    assert safety_radius >= 0.12, "In the function create_unicycle_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m). Recieved %r." % safety_radius
+    assert projection_distance > 0, "In the function create_unicycle_barrier_certificate, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be positive. Recieved %r." % projection_distance
+    assert magnitude_limit > 0, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
+    assert magnitude_limit <= 0.2, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+
+
+    si_barrier_cert = create_single_integrator_barrier_certificate(barrier_gain=barrier_gain, safety_radius=safety_radius+projection_distance)
+
+    si_to_uni_dyn, uni_to_si_states = create_si_to_uni_mapping(projection_distance=projection_distance)
+
+    uni_to_si_dyn = create_uni_to_si_dynamics(projection_distance=projection_distance)
+
+    def f(dxu, x):
+        #Check user input types
+        assert isinstance(dxu, np.ndarray), "In the function created by the create_unicycle_barrier_certificate function, the unicycle robot velocity command (dxu) must be a numpy array. Recieved type %r." % type(dxu).__name__
+        assert isinstance(x, np.ndarray), "In the function created by the create_unicycle_barrier_certificate function, the robot states (x) must be a numpy array. Recieved type %r." % type(x).__name__
+
+        #Check user input ranges/sizes
+        assert x.shape[0] == 3, "In the function created by the create_unicycle_barrier_certificate function, the dimension of the unicycle robot states (x) must be 3 ([x;y;theta]). Recieved dimension %r." % x.shape[0]
+        assert dxu.shape[0] == 2, "In the function created by the create_unicycle_barrier_certificate function, the dimension of the robot unicycle velocity command (dxu) must be 2 ([v;w]). Recieved dimension %r." % dxu.shape[0]
+        assert x.shape[1] == dxu.shape[1], "In the function created by the create_unicycle_barrier_certificate function, the number of robot states (x) must be equal to the number of robot unicycle velocity commands (dxu). Recieved a current robot pose input array (x) of size %r x %r and single integrator velocity array (dxi) of size %r x %r." % (x.shape[0], x.shape[1], dxu.shape[0], dxu.shape[1])
+
+
+        x_si = uni_to_si_states(x)
+        #Convert unicycle control command to single integrator one
+        dxi = uni_to_si_dyn(dxu, x)
+        #Apply single integrator barrier certificate
+        dxi = si_barrier_cert(dxi, x_si)
+        #Return safe unicycle command
+        return si_to_uni_dyn(dxi, x)
+
+    return f
+
+def create_unicycle_barrier_certificate_with_boundary(barrier_gain=100, safety_radius=0.12, projection_distance=0.05, magnitude_limit=0.2, boundary_points = np.array([-1.6, 1.6, -1.0, 1.0])):
+
+    #Check user input types
+    assert isinstance(barrier_gain, (int, float)), "In the function create_unicycle_barrier_certificate, the barrier gain (barrier_gain) must be an integer or float. Recieved type %r." % type(barrier_gain).__name__
+    assert isinstance(safety_radius, (int, float)), "In the function create_unicycle_barrier_certificate, the safe distance between robots (safety_radius) must be an integer or float. Recieved type %r." % type(safety_radius).__name__
+    assert isinstance(projection_distance, (int, float)), "In the function create_unicycle_barrier_certificate, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be an integer or float. Recieved type %r." % type(projection_distance).__name__
+    assert isinstance(magnitude_limit, (int, float)), "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be an integer or float. Recieved type %r." % type(magnitude_limit).__name__
+
+    #Check user input ranges/sizes
+    assert barrier_gain > 0, "In the function create_unicycle_barrier_certificate, the barrier gain (barrier_gain) must be positive. Recieved %r." % barrier_gain
+    assert safety_radius >= 0.12, "In the function create_unicycle_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m). Recieved %r." % safety_radius
+    assert projection_distance > 0, "In the function create_unicycle_barrier_certificate, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be positive. Recieved %r." % projection_distance
+    assert magnitude_limit > 0, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
+    assert magnitude_limit <= 0.2, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+
+
+    si_barrier_cert = create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius+projection_distance, boundary_points=boundary_points)
+
+    si_to_uni_dyn, uni_to_si_states = create_si_to_uni_mapping(projection_distance=projection_distance)
+
+    uni_to_si_dyn = create_uni_to_si_dynamics(projection_distance=projection_distance)
+
+    def f(dxu, x):
+        #Check user input types
+        assert isinstance(dxu, np.ndarray), "In the function created by the create_unicycle_barrier_certificate function, the unicycle robot velocity command (dxu) must be a numpy array. Recieved type %r." % type(dxu).__name__
+        assert isinstance(x, np.ndarray), "In the function created by the create_unicycle_barrier_certificate function, the robot states (x) must be a numpy array. Recieved type %r." % type(x).__name__
+
+        #Check user input ranges/sizes
+        assert x.shape[0] == 3, "In the function created by the create_unicycle_barrier_certificate function, the dimension of the unicycle robot states (x) must be 3 ([x;y;theta]). Recieved dimension %r." % x.shape[0]
+        assert dxu.shape[0] == 2, "In the function created by the create_unicycle_barrier_certificate function, the dimension of the robot unicycle velocity command (dxu) must be 2 ([v;w]). Recieved dimension %r." % dxu.shape[0]
+        assert x.shape[1] == dxu.shape[1], "In the function created by the create_unicycle_barrier_certificate function, the number of robot states (x) must be equal to the number of robot unicycle velocity commands (dxu). Recieved a current robot pose input array (x) of size %r x %r and single integrator velocity array (dxi) of size %r x %r." % (x.shape[0], x.shape[1], dxu.shape[0], dxu.shape[1])
+
+
+        x_si = uni_to_si_states(x)
+        #Convert unicycle control command to single integrator one
+        dxi = uni_to_si_dyn(dxu, x)
+        #Apply single integrator barrier certificate
+        dxi = si_barrier_cert(dxi, x_si)
+        #Return safe unicycle command
+        return si_to_uni_dyn(dxi, x)
+
+    return f
+
+def create_unicycle_barrier_certificate2(barrier_gain=500, unsafe_barrier_gain=1e6, safety_radius=0.12, projection_distance=0.05, magnitude_limit=0.2):
+
+    #Check user input types
+    assert isinstance(barrier_gain, (int, float)), "In the function create_unicycle_barrier_certificate2, the barrier gain inside the safe set (barrier_gain) must be an integer or float. Recieved type %r." % type(barrier_gain).__name__
+    assert isinstance(unsafe_barrier_gain, (int, float)), "In the function create_unicycle_barrier_certificate2, the barrier gain outside the safe set (unsafe_barrier_gain) must be an integer or float. Recieved type %r." % type(unsafe_barrier_gain).__name__
+    assert isinstance(safety_radius, (int, float)), "In the function create_unicycle_barrier_certificate2, the safe distance between robots (safety_radius) must be an integer or float. Recieved type %r." % type(safety_radius).__name__
+    assert isinstance(projection_distance, (int, float)), "In the function create_unicycle_barrier_certificate2, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be an integer or float. Recieved type %r." % type(projection_distance).__name__
+    assert isinstance(magnitude_limit, (int, float)), "In the function create_unicycle_barrier_certificate2, the maximum linear velocity of the robot (magnitude_limit) must be an integer or float. Recieved type %r." % type(magnitude_limit).__name__
+
+    #Check user input ranges/sizes
+    assert barrier_gain > 0, "In the function create_unicycle_barrier_certificate2, the barrier gain inside the safe set (barrier_gain) must be positive. Recieved %r." % barrier_gain
+    assert unsafe_barrier_gain > 0, "In the function create_unicycle_barrier_certificate2, the barrier gain outside the safe set (unsafe_barrier_gain) must be positive. Recieved %r." % unsafe_barrier_gain
+    assert safety_radius >= 0.12, "In the function create_unicycle_barrier_certificate2, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m). Recieved %r." % safety_radius
+    assert projection_distance > 0, "In the function create_unicycle_barrier_certificate2, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be positive. Recieved %r." % projection_distance
+    assert magnitude_limit > 0, "In the function create_unicycle_barrier_certificate2, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
+    assert magnitude_limit <= 0.2, "In the function create_unicycle_barrier_certificate2, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+
+
+    si_barrier_cert = create_single_integrator_barrier_certificate2(barrier_gain=barrier_gain, unsafe_barrier_gain=unsafe_barrier_gain, safety_radius=safety_radius+projection_distance)
+
+    si_to_uni_dyn, uni_to_si_states = create_si_to_uni_mapping(projection_distance=projection_distance)
+
+    uni_to_si_dyn = create_uni_to_si_dynamics(projection_distance=projection_distance)
+
+    def f(dxu, x):
+        #Check user input types
+        assert isinstance(dxu, np.ndarray), "In the function created by the create_unicycle_barrier_certificate function, the unicycle robot velocity command (dxu) must be a numpy array. Recieved type %r." % type(dxu).__name__
+        assert isinstance(x, np.ndarray), "In the function created by the create_unicycle_barrier_certificate function, the robot states (x) must be a numpy array. Recieved type %r." % type(x).__name__
+
+        #Check user input ranges/sizes
+        assert x.shape[0] == 3, "In the function created by the create_unicycle_barrier_certificate function, the dimension of the unicycle robot states (x) must be 3 ([x;y;theta]). Recieved dimension %r." % x.shape[0]
+        assert dxu.shape[0] == 2, "In the function created by the create_unicycle_barrier_certificate function, the dimension of the robot unicycle velocity command (dxu) must be 2 ([v;w]). Recieved dimension %r." % dxu.shape[0]
+        assert x.shape[1] == dxu.shape[1], "In the function created by the create_unicycle_barrier_certificate function, the number of robot states (x) must be equal to the number of robot unicycle velocity commands (dxu). Recieved a current robot pose input array (x) of size %r x %r and single integrator velocity array (dxi) of size %r x %r." % (x.shape[0], x.shape[1], dxu.shape[0], dxu.shape[1])
+
+
+        x_si = uni_to_si_states(x)
+        #Convert unicycle control command to single integrator one
+        dxi = uni_to_si_dyn(dxu, x)
+        #Apply single integrator barrier certificate
+        dxi = si_barrier_cert(dxi, x_si)
+        #Return safe unicycle command
+        return si_to_uni_dyn(dxi, x)
+
+    return f
+
+def create_unicycle_differential_drive_barrier_certificate(max_num_obstacle_points = 100, max_num_robots = 30, disturbance = 5, wheel_vel_limit = 12.5, base_length = 0.105, wheel_radius = 0.016,
+    projection_distance =0.05, barrier_gain = 150, safety_radius = 0.17):
+    
+
+    D = np.matrix([[wheel_radius/2, wheel_radius/2], [-wheel_radius/base_length, wheel_radius/base_length]])
+    L = np.matrix([[1,0],[0,projection_distance]])* D
+    disturb = np.matrix([[-disturbance, -disturbance, disturbance, disturbance],[-disturbance, disturbance, disturbance, -disturbance]])
+    num_disturbs = np.size(disturb[1,:])
+
+    max_num_constraints = (max_num_robots**2-max_num_robots)//2 + max_num_robots*max_num_obstacle_points
+    A = np.matrix(np.zeros([max_num_constraints, 2*max_num_robots]))
+    b = np.matrix(np.zeros([max_num_constraints, 1]))
+    Os = np.matrix(np.zeros([2,max_num_robots]))
+    ps = np.matrix(np.zeros([2,max_num_robots]))
+    Ms = np.matrix(np.zeros([2,2*max_num_robots]))
+
+    def robust_barriers(dxu, x, obstacles=np.empty(0)):
+
+        num_robots = np.size(dxu[0,:])
+
+        if obstacles.size != 0:
+            num_obstacles = np.size(obstacles[0,:])
+        else:
+            num_obstacles = 0
+
+        if(num_robots < 2):
+            temp = 0
+        else:
+            temp = (num_robots**2-num_robots)//2
+
+
+        # Generate constraints for barrier certificates based on the size of the safety radius
+        num_constraints = temp + num_robots*num_obstacles
+        A[0:num_constraints, 0:2*num_robots] = 0
+        Os[0, 0:num_robots] = np.cos(x[2, :])
+        Os[1, 0:num_robots] = np.sin(x[2, :])
+        ps[:, 0:num_robots] = x[0:2, :] + projection_distance*Os[:, 0:num_robots]
+        # Ms Real Form
+        # Ms[0, 0:2*num_robots:2] = Os[0, 0:num_robots]
+        # Ms[0, 1:2*num_robots:2] = -projection_distance*Os[1, 0:num_robots]
+        # Ms[1, 1:2*num_robots:2] = projection_distance*Os[0, 0:num_robots]
+        # Ms[1, 0:2*num_robots:2] = Os[1, 0:num_robots]
+        # Flipped Ms to be able to perform desired matrix multiplication
+        Ms[0, 0:2*num_robots:2] = Os[0, 0:num_robots]
+        Ms[0, 1:2*num_robots:2] = Os[1, 0:num_robots]
+        Ms[1, 1:2*num_robots:2] = projection_distance*Os[0, 0:num_robots]
+        Ms[1, 0:2*num_robots:2] = -projection_distance*Os[1, 0:num_robots]
+        MDs  = (Ms.T * D).T
+        temp = np.copy(MDs[1, 0:2*num_robots:2])
+        MDs[1, 0:2*num_robots:2] =  MDs[0, 1:2*num_robots:2]
+        MDs[0, 1:2*num_robots:2] = temp
+
+        count = 0
+
+        for i in range(num_robots-1):
+            diffs = ps[:,i] - ps[:, i+1:num_robots]
+            hs = np.sum(np.square(diffs),0) - safety_radius**2 # 1 by N
+            h_dot_is = 2*diffs.T*MDs[:,(2*i, 2*i+1)] # N by 2
+            h_dot_js = np.matrix(np.zeros((2,num_robots - (i+1))))
+            h_dot_js[0, :] = -np.sum(2*np.multiply(diffs, MDs[:,2*(i+1):2*num_robots:2]), 0)
+            h_dot_js[1, :] = -np.sum(2*np.multiply(diffs, MDs[:,2*(i+1)+1:2*num_robots:2]), 0)
+            new_constraints = num_robots - i - 1
+            A[count:count+new_constraints, (2*i):(2*i+2)] = h_dot_is
+            A[range(count,count+new_constraints), range(2*(i+1),2*num_robots,2)] = h_dot_js[0,:]
+            A[range(count,count+new_constraints), range(2*(i+1)+1,2*num_robots,2)] = h_dot_js[1,:]
+            b[count:count+new_constraints] = -barrier_gain*(np.power(hs,3)).T - np.min(h_dot_is*disturb,1) - np.min(h_dot_js.T*disturb,1)
+            count += new_constraints
+
+        if obstacles.size != 0:
+            # Do obstacles
+            for i in range(num_robots):
+                diffs = (ps[:, i] - obstacles)
+                h = np.sum(np.square(diffs),0) - safety_radius**2
+                h_dot_i = 2*diffs.T*MDs[:,2*i:2*i+2]
+                A[count:count+num_obstacles,(2*i):(2*i+2)] = h_dot_i
+                b[count:count+num_obstacles] = -barrier_gain*(np.power(h,3)).T  - np.min(h_dot_i*disturb, 1)
+                count = count + num_obstacles
+
+        # Adding Upper Bounds On Wheels
+        A[count:count+2*num_robots,0:2*num_robots] = -np.eye(2*num_robots)
+        b[count:count+2*num_robots] = -wheel_vel_limit
+        count += 2*num_robots
+        # # Adding Lower Bounds on Wheels
+        A[count:count+2*num_robots,0:2*num_robots] = np.eye(2*num_robots)
+        b[count:count+2*num_robots] = -wheel_vel_limit
+        count += 2*num_robots
+
+        # Solve QP program generated earlier
+        L_all = np.kron(np.eye(num_robots), L)
+        dxu = np.linalg.inv(D)*dxu # Convert user input to differential drive
+        vhat = np.matrix(np.reshape(dxu ,(2*num_robots,1), order='F'))
+        H = 2*L_all.T*L_all
+        f = np.transpose(-2*np.transpose(vhat)*np.transpose(L_all)*L_all)
+
+        # Alternative Solver
+        #start = time.time()
+        #vnew2 = solvers.qp(matrix(H), matrix(f), -matrix(A[0:count,0:2*num_robots]), -matrix( b[0:count]))['x'] # , A, b) Omit last 2 arguments since our QP has no equality constraints
+        #print("Time Taken by cvxOpt: {} s".format(time.time() - start))
+
+        vnew = solver2.solve_qp(H, -np.squeeze(np.array(f)), A[0:count,0:2*num_robots].T, np.squeeze(np.array(b[0:count])))[0]
+        # Initial Guess for Solver at the Next Iteration
+        # vnew = quadprog(H, double(f), -A(1:num_constraints,1:2*num_robots), -b(1:num_constraints), [], [], -wheel_vel_limit*ones(2*num_robots,1), wheel_vel_limit*ones(2*num_robots,1), [], opts);
+        # Set robot velocities to new velocities
+        dxu = np.reshape(vnew, (2, num_robots), order='F')
+        dxu = D*dxu
+
+        return dxu
+
+    return robust_barriers
+
+def create_unicycle_differential_drive_barrier_certificate_with_boundary(max_num_obstacle_points = 100, max_num_robots = 30, disturbance = 5, wheel_vel_limit = 12.5, base_length = 0.105, wheel_radius = 0.016,
+    projection_distance =0.05, barrier_gain = 150, safety_radius = 0.17, boundary_points = np.array([-1.6, 1.6, -1.0, 1.0])):
+    
+
+    D = np.array([[wheel_radius/2, wheel_radius/2], [-wheel_radius/base_length, wheel_radius/base_length]])
+    L = np.array([[1,0],[0,projection_distance]]).dot(D)
+    disturb = np.array([[-disturbance, -disturbance, disturbance, disturbance],[-disturbance, disturbance, disturbance, -disturbance]])
+    num_disturbs = disturb.shape[1]
+
+    max_num_constraints = (max_num_robots**2-max_num_robots)//2 + max_num_robots*max_num_obstacle_points
+    A = np.zeros([max_num_constraints, 2*max_num_robots])
+    b = np.zeros([max_num_constraints, 1])
+    Os = np.zeros([2,max_num_robots])
+    ps = np.zeros([2,max_num_robots])
+    Ms = np.zeros([2,2*max_num_robots])
+
+    def robust_barriers(dxu, x, obstacles=np.empty(0)):
+
+        num_robots = np.size(dxu[0,:])
+
+        if obstacles.size != 0:
+            num_obstacles = np.size(obstacles[0,:])
+        else:
+            num_obstacles = 0
+
+        if(num_robots < 2):
+            temp = 0
+        else:
+            temp = (num_robots**2-num_robots)//2
+
+
+        # Generate constraints for barrier certificates based on the size of the safety radius
+        num_constraints = temp + num_robots*num_obstacles + 4*num_robots
+        A[0:num_constraints, 0:2*num_robots] = 0
+        Os[0, 0:num_robots] = np.cos(x[2, :])
+        Os[1, 0:num_robots] = np.sin(x[2, :])
+        ps[:, 0:num_robots] = x[:2, :] + projection_distance*Os[:, 0:num_robots]
+        Ms[0, 0:2*num_robots:2] = Os[0, 0:num_robots]
+        Ms[0, 1:2*num_robots:2] = -projection_distance*Os[1, 0:num_robots]
+        Ms[1, 1:2*num_robots:2] = projection_distance*Os[0, 0:num_robots]
+        Ms[1, 0:2*num_robots:2] = Os[1, 0:num_robots]
+        ret = np.zeros([1,temp])
+
+        count = 0
+
+        for i in range(num_robots-1):
+            for j in range(i+1, num_robots):
+                diff = ps[:, [i]] - ps[:, [j]]
+                h = np.sum(np.square(diff),0) - safety_radius**2
+                h_dot_i = 2*diff.T.dot(Ms[:, ((2*i), (2*i+1))].dot(D))
+                h_dot_j = -2*diff.T.dot(Ms[:, ((2*j), (2*j+1))].dot(D))
+                h_dot_i = np.reshape(h_dot_i, (1,2))
+                h_dot_j = np.reshape(h_dot_j, (1,2))
+                A[count, ((2*i), (2*i+1))]=h_dot_i
+                A[count, ((2*j), (2*j+1))]=h_dot_j
+                b[count] = -barrier_gain*(np.power(h,3))  - np.min(h_dot_i.dot(disturb), 1) - np.min(h_dot_j.dot(disturb), 1)
+                count += 1
+
+        if obstacles.size != 0:
+            # Do obstacles
+            for i in range(num_robots):
+                diffs = (ps[:, i] - obstacles)
+                h = np.sum(np.square(diff),0) - safety_radius**2
+                h_dot_i = 2*diffs*Ms[:, (2*i, 2*i+1)].dot(D)
+                A[count:count+num_obstacles, ((2*i),(2*i+1))] = h_dot_i
+                b[count:count+num_obstacles] = -barrier_gain*(np.power(h,3))  - np.min(h_dot_i.dot(disturb), 1)
+                count = count + num_obstacles
+
+        for k in range(num_robots):
+            #Pos Y
+            A[count, (2*k, 2*k+1)] = -Ms[1,(2*k,2*k+1)].dot(D)
+            b[count] = -0.4*barrier_gain*(boundary_points[3] - safety_radius/2 - ps[1,k])**3;
+            count += 1
+
+            #Neg Y
+            A[count, (2*k, 2*k+1)] = Ms[1,(2*k,2*k+1)].dot(D)
+            b[count] = -0.4*barrier_gain*(-boundary_points[2] - safety_radius/2 + ps[1,k])**3;
+            count += 1
+
+            #Pos X
+            A[count, (2*k, 2*k+1)] = -Ms[0,(2*k,2*k+1)].dot(D)
+            b[count] = -0.4*barrier_gain*(boundary_points[1] - safety_radius/2 - ps[0,k])**3;
+            count += 1
+
+            #Neg X
+            A[count, (2*k, 2*k+1)] = Ms[0,(2*k,2*k+1)].dot(D)
+            b[count] = -0.4*barrier_gain*(-boundary_points[0] - safety_radius/2 + ps[0,k])**3;
+            count += 1
+
+        # Adding Upper Bounds On Wheels
+        A[count:count+2*num_robots,0:2*num_robots] = -np.eye(2*num_robots)
+        b[count:count+2*num_robots] = -wheel_vel_limit
+        count += 2*num_robots
+        # # Adding Lower Bounds on Wheels
+        A[count:count+2*num_robots,0:2*num_robots] = np.eye(2*num_robots)
+        b[count:count+2*num_robots] = -wheel_vel_limit
+        count += 2*num_robots
+
+        # Solve QP program generated earlier
+        L_all = np.kron(np.eye(num_robots), L)
+        dxu = np.linalg.inv(D).dot(dxu) # Convert user input to differential drive
+        vhat = np.reshape(dxu ,(2*num_robots,1), order='F')
+        H = 2*L_all.T.dot(L_all)
+        f = -2*vhat.T.dot(L_all.T.dot(L_all))
+
+        # Alternative Solver
+        #start = time.time()
+        vnew = qp(matrix(H), matrix(f.T), -matrix(A[0:count,0:2*num_robots]), -matrix( b[0:count]))['x'] # , A, b) Omit last 2 arguments since our QP has no equality constraints
+        #print("Time Taken by cvxOpt: {} s".format(time.time() - start))
+
+        # vnew = solver2.solve_qp(H, np.float64(f), -A[0:count,0:2*num_robots], -np.array(b[0:count]))[0]
+        # Initial Guess for Solver at the Next Iteration
+        # vnew = quadprog(H, double(f), -A(1:num_constraints,1:2*num_robots), -b(1:num_constraints), [], [], -wheel_vel_limit*ones(2*num_robots,1), wheel_vel_limit*ones(2*num_robots,1), [], opts);
+        # Set robot velocities to new velocities
+        dxu = np.reshape(vnew, (2, -1), order='F')
+        dxu = D.dot(dxu)
+
+        return dxu
+
+    return robust_barriers
+
+
+
+
+def generate_initial_conditions(N, spacing=0.3, width=3, height=1.8):
+    #Check user input types
+    assert isinstance(N, int), "In the function generate_initial_conditions, the number of robots (N) to generate intial conditions for must be an integer. Recieved type %r." % type(N).__name__
+    assert isinstance(spacing, (float,int)), "In the function generate_initial_conditions, the minimum spacing between robots (spacing) must be an integer or float. Recieved type %r." % type(spacing).__name__
+    assert isinstance(width, (float,int)), "In the function generate_initial_conditions, the width of the area to place robots randomly (width) must be an integer or float. Recieved type %r." % type(width).__name__
+    assert isinstance(height, (float,int)), "In the function generate_initial_conditions, the height of the area to place robots randomly (width) must be an integer or float. Recieved type %r." % type(height).__name__
+
+    #Check user input ranges/sizes
+    assert N > 0, "In the function generate_initial_conditions, the number of robots to generate initial conditions for (N) must be positive. Recieved %r." % N
+    assert spacing > 0, "In the function generate_initial_conditions, the spacing between robots (spacing) must be positive. Recieved %r." % spacing
+    assert width > 0, "In the function generate_initial_conditions, the width of the area to initialize robots randomly (width) must be positive. Recieved %r." % width
+    assert height >0, "In the function generate_initial_conditions, the height of the area to initialize robots randomly (height) must be positive. Recieved %r." % height
+
+    x_range = int(np.floor(width/spacing))
+    y_range = int(np.floor(height/spacing))
+
+    assert x_range != 0, "In the function generate_initial_conditions, the space between robots (space) is too large compared to the width of the area robots are randomly initialized in (width)."
+    assert y_range != 0, "In the function generate_initial_conditions, the space between robots (space) is too large compared to the height of the area robots are randomly initialized in (height)."
+    assert x_range*y_range > N, "In the function generate_initial_conditions, it is impossible to place %r robots within a %r x %r meter area with a spacing of %r meters." % (N, width, height, spacing)
+
+    choices = (np.random.choice(x_range*y_range, N, replace=False)+1)
+
+    poses = np.zeros((3, N))
+
+    for i, c in enumerate(choices):
+        x,y = divmod(c, y_range)
+        poses[0, i] = x*spacing - width/2
+        poses[1, i] = y*spacing - height/2
+        poses[2, i] = np.random.rand()*2*np.pi - np.pi
+
+    return poses
+
+def at_pose(states, poses, position_error=0.05, rotation_error=0.2):
+    #Check user input types
+    assert isinstance(states, np.ndarray), "In the at_pose function, the robot current state argument (states) must be a numpy ndarray. Recieved type %r." % type(states).__name__
+    assert isinstance(poses, np.ndarray), "In the at_pose function, the checked pose argument (poses) must be a numpy ndarray. Recieved type %r." % type(poses).__name__
+    assert isinstance(position_error, (float,int)), "In the at_pose function, the allowable position error argument (position_error) must be an integer or float. Recieved type %r." % type(position_error).__name__
+    assert isinstance(rotation_error, (float,int)), "In the at_pose function, the allowable angular error argument (rotation_error) must be an integer or float. Recieved type %r." % type(rotation_error).__name__
+
+    #Check user input ranges/sizes
+    assert states.shape[0] == 3, "In the at_pose function, the dimension of the state of each robot must be 3 ([x;y;theta]). Recieved %r." % states.shape[0]
+    assert poses.shape[0] == 3, "In the at_pose function, the dimension of the checked pose of each robot must be 3 ([x;y;theta]). Recieved %r." % poses.shape[0]
+    assert states.shape == poses.shape, "In the at_pose function, the robot current state and checked pose inputs must be the same size (3xN, where N is the number of robots being checked). Recieved a state array of size %r x %r and checked pose array of size %r x %r." % (states.shape[0], states.shape[1], poses.shape[0], poses.shape[1])
+
+    # Calculate rotation errors with angle wrapping
+    res = states[2, :] - poses[2, :]
+    res = np.abs(np.arctan2(np.sin(res), np.cos(res)))
+
+    # Calculate position errors
+    pes = np.linalg.norm(states[:2, :] - poses[:2, :], 2, 0)
+
+    # Determine which agents are done
+    done = np.nonzero((res <= rotation_error) & (pes <= position_error))
+
+    return done
+
+def at_position(states, points, position_error=0.02):
+
+    #Check user input types
+    assert isinstance(states, np.ndarray), "In the at_position function, the robot current state argument (states) must be a numpy ndarray. Recieved type %r." % type(states).__name__
+    assert isinstance(points, np.ndarray), "In the at_position function, the desired pose argument (poses) must be a numpy ndarray. Recieved type %r." % type(points).__name__
+    assert isinstance(position_error, (float,int)), "In the at_position function, the allowable position error argument (position_error) must be an integer or float. Recieved type %r." % type(position_error).__name__
+    
+    #Check user input ranges/sizes
+    assert states.shape[0] == 3, "In the at_position function, the dimension of the state of each robot (states) must be 3. Recieved %r." % states.shape[0]
+    assert points.shape[0] == 2, "In the at_position function, the dimension of the checked position for each robot (points) must be 2. Recieved %r." % points.shape[0]
+    assert states.shape[1] == poses.shape[1], "In the at_position function, the number of checked points (points) must match the number of robot states provided (states). Recieved a state array of size %r x %r and desired pose array of size %r x %r." % (states.shape[0], states.shape[1], points.shape[0], points.shape[1])
+
+    # Calculate position errors
+    pes = np.linalg.norm(states[:2, :] - points, 2, 0)
+
+    # Determine which agents are done
+    done = np.nonzero((pes <= position_error))
+
+    return done
+
+def determine_marker_size(robotarium_instance, marker_size_meters):
+
+	# Get the x and y dimension of the robotarium figure window in pixels
+	fig_dim_pixels = robotarium_instance.axes.transData.transform(np.array([[robotarium_instance.boundaries[2]],[robotarium_instance.boundaries[3]]]))
+
+	# Determine the ratio of the robot size to the x-axis (the axis are
+	# normalized so you could do this with y and figure height as well).
+	marker_ratio = (marker_size_meters)/(robotarium_instance.boundaries[2])
+
+	# Determine the marker size in points so it fits the window. Note: This is squared
+	# as marker sizes are areas.
+	return (fig_dim_pixels[0,0] * marker_ratio)**2.
+
+
+def determine_font_size(robotarium_instance, font_height_meters):
+
+	# Get the x and y dimension of the robotarium figure window in pixels
+	y1, y2 = robotarium_instance.axes.get_window_extent().get_points()[:,1]
+
+	# Determine the ratio of the robot size to the y-axis.
+	font_ratio = (y2-y1)/(robotarium_instance.boundaries[2])
+
+	# Determine the font size in points so it fits the window.
+	return (font_ratio*font_height_meters)
+
+#from rps.utilities.transformations import *
+
+def create_si_position_controller(x_velocity_gain=1, y_velocity_gain=1, velocity_magnitude_limit=0.15):
+
+    #Check user input types
+    assert isinstance(x_velocity_gain, (int, float)), "In the function create_si_position_controller, the x linear velocity gain (x_velocity_gain) must be an integer or float. Recieved type %r." % type(x_velocity_gain).__name__
+    assert isinstance(y_velocity_gain, (int, float)), "In the function create_si_position_controller, the y linear velocity gain (y_velocity_gain) must be an integer or float. Recieved type %r." % type(y_velocity_gain).__name__
+    assert isinstance(velocity_magnitude_limit, (int, float)), "In the function create_si_position_controller, the velocity magnitude limit (y_velocity_gain) must be an integer or float. Recieved type %r." % type(y_velocity_gain).__name__
+    
+    #Check user input ranges/sizes
+    assert x_velocity_gain > 0, "In the function create_si_position_controller, the x linear velocity gain (x_velocity_gain) must be positive. Recieved %r." % x_velocity_gain
+    assert y_velocity_gain > 0, "In the function create_si_position_controller, the y linear velocity gain (y_velocity_gain) must be positive. Recieved %r." % y_velocity_gain
+    assert velocity_magnitude_limit >= 0, "In the function create_si_position_controller, the velocity magnitude limit (velocity_magnitude_limit) must not be negative. Recieved %r." % velocity_magnitude_limit
+    
+    gain = np.diag([x_velocity_gain, y_velocity_gain])
+
+    def si_position_controller(xi, positions):
+
+
+        #Check user input types
+        assert isinstance(xi, np.ndarray), "In the si_position_controller function created by the create_si_position_controller function, the single-integrator robot states (xi) must be a numpy array. Recieved type %r." % type(xi).__name__
+        assert isinstance(positions, np.ndarray), "In the si_position_controller function created by the create_si_position_controller function, the robot goal points (positions) must be a numpy array. Recieved type %r." % type(positions).__name__
+
+        #Check user input ranges/sizes
+        assert xi.shape[0] == 2, "In the si_position_controller function created by the create_si_position_controller function, the dimension of the single-integrator robot states (xi) must be 2 ([x;y]). Recieved dimension %r." % xi.shape[0]
+        assert positions.shape[0] == 2, "In the si_position_controller function created by the create_si_position_controller function, the dimension of the robot goal points (positions) must be 2 ([x_goal;y_goal]). Recieved dimension %r." % positions.shape[0]
+        assert xi.shape[1] == positions.shape[1], "In the si_position_controller function created by the create_si_position_controller function, the number of single-integrator robot states (xi) must be equal to the number of robot goal points (positions). Recieved a single integrator current position input array of size %r x %r and desired position array of size %r x %r." % (xi.shape[0], xi.shape[1], positions.shape[0], positions.shape[1])
+
+        _,N = np.shape(xi)
+        dxi = np.zeros((2, N))
+
+        # Calculate control input
+        dxi[0][:] = x_velocity_gain*(positions[0][:]-xi[0][:])
+        dxi[1][:] = y_velocity_gain*(positions[1][:]-xi[1][:])
+
+        # Threshold magnitude
+        norms = np.linalg.norm(dxi, axis=0)
+        idxs = np.where(norms > velocity_magnitude_limit)
+        if norms[idxs].size != 0:
+            dxi[:, idxs] *= velocity_magnitude_limit/norms[idxs]
+
+        return dxi
+
+    return si_position_controller
+
+def create_clf_unicycle_position_controller(linear_velocity_gain=0.8, angular_velocity_gain=3):
+
+    #Check user input types
+    assert isinstance(linear_velocity_gain, (int, float)), "In the function create_clf_unicycle_position_controller, the linear velocity gain (linear_velocity_gain) must be an integer or float. Recieved type %r." % type(linear_velocity_gain).__name__
+    assert isinstance(angular_velocity_gain, (int, float)), "In the function create_clf_unicycle_position_controller, the angular velocity gain (angular_velocity_gain) must be an integer or float. Recieved type %r." % type(angular_velocity_gain).__name__
+    
+    #Check user input ranges/sizes
+    assert linear_velocity_gain >= 0, "In the function create_clf_unicycle_position_controller, the linear velocity gain (linear_velocity_gain) must be greater than or equal to zero. Recieved %r." % linear_velocity_gain
+    assert angular_velocity_gain >= 0, "In the function create_clf_unicycle_position_controller, the angular velocity gain (angular_velocity_gain) must be greater than or equal to zero. Recieved %r." % angular_velocity_gain
+     
+
+    def position_uni_clf_controller(states, positions):
+
+
+        #Check user input types
+        assert isinstance(states, np.ndarray), "In the function created by the create_clf_unicycle_position_controller function, the single-integrator robot states (xi) must be a numpy array. Recieved type %r." % type(states).__name__
+        assert isinstance(positions, np.ndarray), "In the function created by the create_clf_unicycle_position_controller function, the robot goal points (positions) must be a numpy array. Recieved type %r." % type(positions).__name__
+
+        #Check user input ranges/sizes
+        assert states.shape[0] == 3, "In the function created by the create_clf_unicycle_position_controller function, the dimension of the unicycle robot states (states) must be 3 ([x;y;theta]). Recieved dimension %r." % states.shape[0]
+        assert positions.shape[0] == 2, "In the function created by the create_clf_unicycle_position_controller function, the dimension of the robot goal positions (positions) must be 2 ([x_goal;y_goal]). Recieved dimension %r." % positions.shape[0]
+        assert states.shape[1] == positions.shape[1], "In the function created by the create_clf_unicycle_position_controller function, the number of unicycle robot states (states) must be equal to the number of robot goal positions (positions). Recieved a current robot pose input array (states) of size %r states %r and desired position array (positions) of size %r states %r." % (states.shape[0], states.shape[1], positions.shape[0], positions.shape[1])
+
+
+        _,N = np.shape(states)
+        dxu = np.zeros((2, N))
+
+        pos_error = positions - states[:2][:]
+        rot_error = np.arctan2(pos_error[1][:],pos_error[0][:])
+        dist = np.linalg.norm(pos_error, axis=0)
+
+        dxu[0][:]=linear_velocity_gain*dist*np.cos(rot_error-states[2][:])
+        dxu[1][:]=angular_velocity_gain*dist*np.sin(rot_error-states[2][:])
+
+        return dxu
+
+    return position_uni_clf_controller
+
+def create_clf_unicycle_pose_controller(approach_angle_gain=1, desired_angle_gain=2.7, rotation_error_gain=1):
+
+    gamma = approach_angle_gain
+    k = desired_angle_gain
+    h = rotation_error_gain
+
+    def R(theta):
+        return np.array([[np.cos(theta), -np.sin(theta)],[np.sin(theta),np.cos(theta)]])
+
+    def pose_uni_clf_controller(states, poses):
+
+        N_states = states.shape[1]
+        dxu = np.zeros((2,N_states))
+
+        for i in range(N_states):
+            translate = R(-poses[2,i]).dot((poses[:2,i]-states[:2,i]))
+            e = np.linalg.norm(translate)
+            theta = np.arctan2(translate[1],translate[0])
+            alpha = theta - (states[2,i]-poses[2,i])
+            alpha = np.arctan2(np.sin(alpha),np.cos(alpha))
+
+            ca = np.cos(alpha)
+            sa = np.sin(alpha)
+
+            print(gamma)
+            print(e)
+            print(ca)
+
+            dxu[0,i] = gamma* e* ca
+            dxu[1,i] = k*alpha + gamma*((ca*sa)/alpha)*(alpha + h*theta)
+
+        return dxu
+
+    return pose_uni_clf_controller
+
+def create_hybrid_unicycle_pose_controller(linear_velocity_gain=1, angular_velocity_gain=2, velocity_magnitude_limit=0.15, angular_velocity_limit=np.pi, position_error=0.05, position_epsilon=0.02, rotation_error=0.05):
+    '''Returns a controller ($u: \mathbf{R}^{3 \times N} \times \mathbf{R}^{3 \times N} \to \mathbf{R}^{2 \times N}$)
+    that will drive a unicycle-modeled agent to a pose (i.e., position & orientation). This controller is
+    based on a hybrid controller that will drive the robot in a straight line to the desired position then rotate
+    to the desired position.
+    
+    linear_velocity_gain - affects how much the linear velocity is scaled based on the position error
+    angular_velocity_gain - affects how much the angular velocity is scaled based on the heading error
+    velocity_magnitude_limit - threshold for the max linear velocity that will be achieved by the robot
+    angular_velocity_limit - threshold for the max rotational velocity that will be achieved by the robot
+    position_error - the error tolerance for the final position of the robot
+    position_epsilon - the amount of translational distance that is allowed by the rotation before correcting position again.
+    rotation_error - the error tolerance for the final orientation of the robot
+
+    '''
+
+    si_to_uni_dyn = create_si_to_uni_dynamics(linear_velocity_gain=linear_velocity_gain, angular_velocity_limit=angular_velocity_limit)
+
+    def pose_uni_hybrid_controller(states, poses, input_approach_state = np.empty([0,0])):
+        N=states.shape[1]
+        dxu = np.zeros((2,N))
+
+        #This is essentially a hack since default arguments are evaluated only once we will mutate it with each call
+        if input_approach_state.shape[1] != N: 
+            approach_state = np.ones((1,N))[0]
+
+        for i in range(N):
+            wrapped = poses[2,i] - states[2,i]
+            wrapped = np.arctan2(np.sin(wrapped),np.cos(wrapped))
+
+            dxi = poses[:2,[i]] - states[:2,[i]]
+
+            #Normalize Vector
+            norm_ = np.linalg.norm(dxi)
+
+            if(norm_ > (position_error - position_epsilon) and approach_state[i]):
+                if(norm_ > velocity_magnitude_limit):
+                    dxi = velocity_magnitude_limit*dxi/norm_
+                dxu[:,[i]] = si_to_uni_dyn(dxi, states[:,[i]])
+            elif(np.absolute(wrapped) > rotation_error):
+                approach_state[i] = 0
+                if(norm_ > position_error):
+                    approach_state = 1
+                dxu[0,i] = 0
+                dxu[1,i] = angular_velocity_gain*wrapped
+            else:
+                dxu[:,[i]] = np.zeros((2,1))
+
+        return dxu
+
+    return pose_uni_hybrid_controller
+
+
+
+# RobotariumABC: This is an interface for the Robotarium class that
+# ensures the simulator and the robots match up properly.  
+
+# THIS FILE SHOULD NEVER BE MODIFIED OR SUBMITTED!
+
+class RobotariumABC(ABC):
+
+    def __init__(self, number_of_robots=-1, show_figure=True, sim_in_real_time=True, initial_conditions=np.array([])):
+
+        #Check user input types
+        assert isinstance(number_of_robots,int), "The number of robots used argument (number_of_robots) provided to create the Robotarium object must be an integer type. Recieved type %r." % type(number_of_robots).__name__
+        assert isinstance(initial_conditions,np.ndarray), "The initial conditions array argument (initial_conditions) provided to create the Robotarium object must be a numpy ndarray. Recieved type %r." % type(initial_conditions).__name__
+        assert isinstance(show_figure,bool), "The display figure window argument (show_figure) provided to create the Robotarium object must be boolean type. Recieved type %r." % type(show_figure).__name__
+        assert isinstance(sim_in_real_time,bool), "The simulation running at 0.033s per loop (sim_real_time) provided to create the Robotarium object must be boolean type. Recieved type %r." % type(show_figure).__name__
+        
+        #Check user input ranges/sizes
+        assert (number_of_robots >= 0 and number_of_robots <= 50), "Requested %r robots to be used when creating the Robotarium object. The deployed number of robots must be between 0 and 50." % number_of_robots 
+        if (initial_conditions.size > 0):
+            assert initial_conditions.shape == (3, number_of_robots), "Initial conditions provided when creating the Robotarium object must of size 3xN, where N is the number of robots used. Expected a 3 x %r array but recieved a %r x %r array." % (number_of_robots, initial_conditions.shape[0], initial_conditions.shape[1])
+
+
+        self.number_of_robots = number_of_robots
+        self.show_figure = show_figure
+        self.initial_conditions = initial_conditions
+
+        # Boundary stuff -> lower left point / width / height
+        self.boundaries = [-1.6, -1, 3.2, 2]
+
+        self.file_path = None
+        self.current_file_size = 0
+
+        # Constants
+        self.time_step = 0.033
+        self.robot_diameter = 0.11
+        self.wheel_radius = 0.016
+        self.base_length = 0.105
+        self.max_linear_velocity = 0.2
+        self.max_angular_velocity = 2*(self.wheel_radius/self.robot_diameter)*(self.max_linear_velocity/self.wheel_radius)
+        self.max_wheel_velocity = self.max_linear_velocity/self.wheel_radius
+
+        self.robot_radius = self.robot_diameter/2
+
+        self.velocities = np.zeros((2, number_of_robots))
+        self.poses = self.initial_conditions
+        if self.initial_conditions.size == 0:
+            self.poses = misc.generate_initial_conditions(self.number_of_robots, spacing=0.2, width=2.5, height=1.5)
+        
+        self.left_led_commands = []
+        self.right_led_commands = []
+
+        # Visualization
+        self.figure = []
+        self.axes = []
+        self.left_led_patches = []
+        self.right_led_patches = []
+        self.chassis_patches = []
+        self.right_wheel_patches = []
+        self.left_wheel_patches = []
+
+        if(self.show_figure):
+            self.figure, self.axes = plt.subplots()
+            self.axes.set_axis_off()
+            for i in range(number_of_robots):
+                p = patches.RegularPolygon(self.poses[:2, i], 4, math.sqrt(2)*self.robot_radius, self.poses[2,i]+math.pi/4, facecolor='#FFD700', edgecolor = 'k')
+                rled = patches.Circle(self.poses[:2, i]+0.75*self.robot_radius*np.array((np.cos(self.poses[2, i]), np.sin(self.poses[2, i]))+\
+                                        0.04*np.array((-np.sin(self.poses[2, i]+math.pi/2), np.cos(self.poses[2, i]+math.pi/2)))),\
+                                       self.robot_radius/5, fill=False)
+                lled = patches.Circle(self.poses[:2, i]+0.75*self.robot_radius*np.array((np.cos(self.poses[2, i]), np.sin(self.poses[2, i]))+\
+                                        0.015*np.array((-np.sin(self.poses[2, i]+math.pi/2), np.cos(self.poses[2, i]+math.pi/2)))),\
+                                       self.robot_radius/5, fill=False)
+                rw = patches.Circle(self.poses[:2, i]+self.robot_radius*np.array((np.cos(self.poses[2, i]+math.pi/2), np.sin(self.poses[2, i]+math.pi/2)))+\
+                                                0.04*np.array((-np.sin(self.poses[2, i]+math.pi/2), np.cos(self.poses[2, i]+math.pi/2))),\
+                                                0.02, facecolor='k')
+                lw = patches.Circle(self.poses[:2, i]+self.robot_radius*np.array((np.cos(self.poses[2, i]-math.pi/2), np.sin(self.poses[2, i]-math.pi/2)))+\
+                                                0.04*np.array((-np.sin(self.poses[2, i]+math.pi/2))),\
+                                                0.02, facecolor='k')
+                #lw = patches.RegularPolygon(self.poses[:2, i]+self.robot_radius*np.array((np.cos(self.poses[2, i]-math.pi/2), np.sin(self.poses[2, i]-math.pi/2)))+\
+                #                                0.035*np.array((-np.sin(self.poses[2, i]+math.pi/2), np.cos(self.poses[2, i]+math.pi/2))),\
+                #                                4, math.sqrt(2)*0.02, self.poses[2,i]+math.pi/4, facecolor='k')
+
+                self.chassis_patches.append(p)
+                self.left_led_patches.append(lled)
+                self.right_led_patches.append(rled)
+                self.right_wheel_patches.append(rw)
+                self.left_wheel_patches.append(lw)
+
+                self.axes.add_patch(rw)
+                self.axes.add_patch(lw)
+                self.axes.add_patch(p)
+                self.axes.add_patch(lled)
+                self.axes.add_patch(rled)
+
+            # Draw arena
+            self.boundary_patch = self.axes.add_patch(patches.Rectangle(self.boundaries[:2], self.boundaries[2], self.boundaries[3], fill=False))
+
+            self.axes.set_xlim(self.boundaries[0]-0.1, self.boundaries[0]+self.boundaries[2]+0.1)
+            self.axes.set_ylim(self.boundaries[1]-0.1, self.boundaries[1]+self.boundaries[3]+0.1)
+
+            plt.ion()
+            plt.show()
+
+            plt.subplots_adjust(left=-0.03, right=1.03, bottom=-0.03, top=1.03, wspace=0, hspace=0)
+
+    def set_velocities(self, ids, velocities):
+
+        # Threshold linear velocities
+        idxs = np.where(np.abs(velocities[0, :]) > self.max_linear_velocity)
+        velocities[0, idxs] = self.max_linear_velocity*np.sign(velocities[0, idxs])
+
+        # Threshold angular velocities
+        idxs = np.where(np.abs(velocities[1, :]) > self.max_angular_velocity)
+        velocities[1, idxs] = self.max_angular_velocity*np.sign(velocities[1, idxs])
+        self.velocities = velocities
+
+    @abstractmethod
+    def get_poses(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def step(self):
+        raise NotImplementedError()
+
+    #Protected Functions
+    def _threshold(self, dxu):
+        dxdd = self._uni_to_diff(dxu)
+
+        to_thresh = np.absolute(dxdd) > self.max_wheel_velocity
+        dxdd[to_thresh] = self.max_wheel_velocity*np.sign(dxdd[to_thresh])
+
+        dxu = self._diff_to_uni(dxdd)
+
+    def _uni_to_diff(self, dxu):
+        r = self.wheel_radius
+        l = self.base_length
+        dxdd = np.vstack((1/(2*r)*(2*dxu[0,:]-l*dxu[1,:]),1/(2*r)*(2*dxu[0,:]+l*dxu[1,:])))
+
+        return dxdd
+
+    def _diff_to_uni(self, dxdd):
+        r = self.wheel_radius
+        l = self.base_length
+        dxu = np.vstack((r/(2)*(dxdd[0,:]+dxdd[1,:]),r/l*(dxdd[1,:]-dxdd[0,:])))
+
+        return dxu
+
+    def _validate(self, errors = {}):
+        # This is meant to be called on every iteration of step.
+        # Checks to make sure robots are operating within the bounds of reality.
+
+        p = self.poses
+        b = self.boundaries
+        N = self.number_of_robots
+
+
+        for i in range(N):
+            x = p[0,i]
+            y = p[1,i]
+
+            if(x < b[0] or x > (b[0] + b[2]) or y < b[1] or y > (b[1] + b[3])):
+                    if "boundary" in errors:
+                        errors["boundary"] += 1
+                    else:
+                        errors["boundary"] = 1
+                        errors["boundary_string"] = "iteration(s) robots were outside the boundaries."
+
+        for j in range(N-1):
+            for k in range(j+1,N):
+                if(np.linalg.norm(p[:2,j]-p[:2,k]) <= self.robot_diameter):
+                    if "collision" in errors:
+                        errors["collision"] += 1
+                    else:
+                        errors["collision"] = 1
+                        errors["collision_string"] = "iteration(s) where robots collided."
+
+        dxdd = self._uni_to_diff(self.velocities)
+        exceeding = np.absolute(dxdd) > self.max_wheel_velocity
+        if(np.any(exceeding)):
+            if "actuator" in errors:
+                errors["actuator"] += 1
+            else:
+                errors["actuator"] = 1
+                errors["actuator_string"] = "iteration(s) where the actuator limits were exceeded."
+
+        return errors
+
+import js
+
+ele = js.document.createElement('img')
+
+class Robotarium(RobotariumABC):
+
+        def __init__(self, number_of_robots=-1, show_figure=True, sim_in_real_time = True, initial_conditions=np.array([])):
+            super().__init__(number_of_robots, show_figure, sim_in_real_time, initial_conditions)
+
+            #Initialize some rendering variables
+            self.previous_render_time = time.time()
+            self.sim_in_real_time = sim_in_real_time
+
+            #Initialize checks for step and get poses calls
+            self._called_step_already = True
+            self._checked_poses_already = False
+
+            #Initialization of error collection.
+            self._errors = {}
+
+            #Initialize steps
+            self._iterations = 0 
+
+        def get_poses(self):
+
+            assert(not self._checked_poses_already), "Can only call get_poses() once per call of step()."
+            # Allow step() to be called again.
+            self._called_step_already = False
+            self._checked_poses_already = True 
+
+            return self.poses
+
+        def call_at_scripts_end(self):
+            print('##### DEBUG OUTPUT #####')
+            print('Your simulation will take approximately {0} real seconds when deployed on the Robotarium. \\n'.format(math.ceil(self._iterations*0.033)))
+
+            if bool(self._errors):
+                if "boundary" in self._errors:
+                    print('\\t Simulation had {0} {1}\\n'.format(self._errors["boundary"], self._errors["boundary_string"]))
+                if "collision" in self._errors:
+                    print('\\t Simulation had {0} {1}\\n'.format(self._errors["collision"], self._errors["collision_string"]))
+                if "actuator" in self._errors:
+                    print('\\t Simulation had {0} {1}'.format(self._errors["actuator"], self._errors["actuator_string"]))
+            else:
+                print('No errors in your simulation! Acceptance of your experiment is likely!')
+
+            return
+
+        def step(self):
+            assert(not self._called_step_already), "Make sure to call get_poses before calling step() again."
+
+            # Allow get_poses function to be called again.
+            self._called_step_already = True
+            self._checked_poses_already = False
+
+            # Validate before thresholding velocities
+            self._errors = self._validate()
+            self._iterations += 1
+
+
+            # Update dynamics of agents
+            self.poses[0, :] = self.poses[0, :] + self.time_step*np.cos(self.poses[2,:])*self.velocities[0, :]
+            self.poses[1, :] = self.poses[1, :] + self.time_step*np.sin(self.poses[2,:])*self.velocities[0, :]
+            self.poses[2, :] = self.poses[2, :] + self.time_step*self.velocities[1, :]
+            # Ensure angles are wrapped
+            self.poses[2, :] = np.arctan2(np.sin(self.poses[2, :]), np.cos(self.poses[2, :]))
+
+            # Update graphics
+            if(self.show_figure):
+                if(self.sim_in_real_time):
+                    t = time.time()
+                    while(t - self.previous_render_time < self.time_step):
+                        t=time.time()
+                    self.previous_render_time = t
+
+                for i in range(self.number_of_robots):
+                    self.chassis_patches[i].center = self.poses[:2, i]
+                    self.chassis_patches[i].orientation = self.poses[2, i] + math.pi/4
+
+                    self.right_wheel_patches[i].center = self.poses[:2, i]+self.robot_radius*np.array((np.cos(self.poses[2, i]+math.pi/2), np.sin(self.poses[2, i]+math.pi/2)))+\
+                                            0.04*np.array((-np.sin(self.poses[2, i]+math.pi/2), np.cos(self.poses[2, i]+math.pi/2)))
+                    self.right_wheel_patches[i].orientation = self.poses[2, i] + math.pi/4
+
+                    self.left_wheel_patches[i].center = self.poses[:2, i]+self.robot_radius*np.array((np.cos(self.poses[2, i]-math.pi/2), np.sin(self.poses[2, i]-math.pi/2)))+\
+                                            0.04*np.array((-np.sin(self.poses[2, i]+math.pi/2), np.cos(self.poses[2, i]+math.pi/2)))
+                    self.left_wheel_patches[i].orientation = self.poses[2,i] + math.pi/4
+                    
+                    self.right_led_patches[i].center = self.poses[:2, i]+0.75*self.robot_radius*np.array((np.cos(self.poses[2,i]), np.sin(self.poses[2,i])))-\
+                                    0.04*np.array((-np.sin(self.poses[2, i]), np.cos(self.poses[2, i])))
+                    self.left_led_patches[i].center = self.poses[:2, i]+0.75*self.robot_radius*np.array((np.cos(self.poses[2,i]), np.sin(self.poses[2,i])))-\
+                                    0.015*np.array((-np.sin(self.poses[2, i]), np.cos(self.poses[2, i])))
+                
+                buf = io.BytesIO()
+                self.figure.savefig(buf, format='png')
+                buf.seek(0)
+                img_str = 'data:image/png;base64,' + base64.b64encode(buf.read()).decode('UTF-8')
+                
+                ele.src = img_str
+                js.document.body.prepend(ele)
+                
+                #self.figure.canvas.draw_idle()
+                #self.figure.canvas.flush_events()
+
+
+###############################################################################################
+# Instantiate Robotarium object
+N = 1
+initial_conditions = np.array(np.mat('0.4; 0.4; 0'))
+r = Robotarium(number_of_robots=N, show_figure=True, initial_conditions=initial_conditions,sim_in_real_time=False)
+
+# Define goal points by removing orientation from poses
+goal_points = generate_initial_conditions(N)
+
+# Create unicycle position controller
+unicycle_position_controller = create_clf_unicycle_position_controller()
+
+# Create barrier certificates to avoid collision
+uni_barrier_cert = create_unicycle_barrier_certificate()
+
+
+radius=0.4
+n=20
+#points = [np.array([[math.cos(2*pi/n*x)*radius+0.2,math.sin(2*pi/n*x)*radius+0.2,0]]) for q in range(0,n+1)]
+#points = np.asmatrix(np.array([[-0.5,0.5,0.5,-0.5],[0.5,0.5,-0.5,-0.5],[0,0,0,0]]))
+
+poses = []
+
+for x in range(n):
+    pose = np.zeros((3, N))
+    pose[0, 0] = math.cos(2*pi/n*x)*radius
+    pose[1, 0] = math.sin(2*pi/n*x)*radius
+    pose[2, 0] = 0
+    poses.append(pose)
+
+
+
+# define x initially
+x = r.get_poses()
+r.step()
+
+# While the number of robots at the required poses is less
+# than N...
+
+for goal_points in poses:
+    line = r.axes.plot(goal_points[0],goal_points[1],color='green', marker='o', linestyle='dashed', linewidth=2, markersize=12)
+    while (np.size(at_pose(x, goal_points, rotation_error=100)) != N):
+
+        # Get poses of agents
+        x = r.get_poses()
+
+        # Create single-integrator control inputs
+        dxu = unicycle_position_controller(x, goal_points[:2][:])
+
+        # Create safe control inputs (i.e., no collisions)
+        #dxu = uni_barrier_cert(dxu, x)
+
+        # Set the velocities by mapping the single-integrator inputs to unciycle inputs
+        r.set_velocities(np.arange(N), dxu*10)
+
+        # Iterate the simulation
+        r.step()
+
+#Call at end of script to print debug information and for your script to run on the Robotarium server properly
+r.call_at_scripts_end()
+
+
+
+
+
+        `);
+      }
+      main();
+
     rpsString = "";
 
     var demoWorkspace = Blockly.inject('blocklyDiv',
