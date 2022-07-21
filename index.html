@@ -107,6 +107,7 @@
                 More
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="font-size: 15px">
+                <li><a class="dropdown-item" href="https://forms.gle/bsiy5sgNZjAYL15Y8" target="_blank">Report Bug</a></li>
                 <li><a class="dropdown-item" href="Help Pages/AboutTheRobotarium.html">Help</a></li>
               </ul>
             </li>
@@ -207,11 +208,12 @@
 
 
   <div id="blocklyDiv" style="height: 600px; width: 100%;"></div>
+  <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
+    style="width:100%; height:500px;display: none"></iFrame>
   <div id="Map" style="width: 100%;">
     <img src="./graph.png" style="display: block; margin-left: auto; margin-right: auto; width: 75%;">
   </div>
-  <iFrame id="video" src="https://sim-server-robo.herokuapp.com/static/uploads/video.mp4"
-    style="width:100%; height:500px;display: none"></iFrame>
+  
   <pre style="width:50%;" class="prettyprint" id="code"></pre>
 
   <!-- The individual blocks are imported to the menu -->
@@ -727,7 +729,7 @@ shapesList = []
 #list of lines to be draw
 lineList = []
 #sets a time limit on the simulation
-t_end = time.time() + 60 * 5
+t_end = time.time() + 60 * 10
 #sets initialy not drawing
 drawing = -1
 #sets default drawing type to ideal
