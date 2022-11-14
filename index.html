@@ -1283,10 +1283,10 @@ r.call_at_scripts_end()
 
     function received(urlStr) {//When received
             var code = document.getElementById('video');
-            code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4" ;
+            code.src = "https://k8bdfm4msw.us-east-2.awsapprunner.com/static/uploads/" + urlStr + ".mp4" ;
             document.getElementById("video").style.display = "block"//Show video
             var code = document.getElementById('video');
-            code.src = "http://localhost:5000/static/uploads/" + urlStr + ".mp4";
+            code.src = "https://k8bdfm4msw.us-east-2.awsapprunner.com/static/uploads/" + urlStr + ".mp4";
             //document.getElementById("loading").src = "https://th.bing.com/th/id/OIP.GKoJ4X3YZVvOp-5Krqk7qAHaHa?pid=ImgDet&rs=1"//cover loading gif with while square
             document.getElementById("loadingText").innerHTML = "";//empty text box
             document.getElementById("loadingGif").style.display = "none"
@@ -1369,7 +1369,7 @@ r.call_at_scripts_end()
         redirect: 'follow'
       };
       try {
-        fetch("http://localhost:5000/simulationVideo", requestOptions)//post
+        fetch("https://k8bdfm4msw.us-east-2.awsapprunner.com/simulationVideo", requestOptions)//post
         .then(function(response) {
             return response.text();
           }).then(function(data) {
